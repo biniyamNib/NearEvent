@@ -34,7 +34,21 @@ export const getMe = async () => {
   return res.data.data;
 };
 
+export const updateProfile = async (payload: {
+  full_name: string;
+  email: string;
+  avatar_url?: string;
+}) => {
+  const res = await api.put("/users/me", payload);
+  return res.data.data;
+};
+
 export const logout = async () => {
   const res = await api.post<ApiSuccess<null>>("/auth/logout");
+  return res.data;
+};
+
+export const forgotPassword = async (email: string) => {
+  const res = await api.post("/auth/forgot-password", { email });
   return res.data;
 };

@@ -34,6 +34,7 @@ type EventResponse struct {
 	ID              string   `json:"id"`
 	OrganizerID     string   `json:"organizer_id"`
 	CategoryID      *string  `json:"category_id,omitempty"`
+	CategoryName    *string  `json:"category_name,omitempty"`
 	Title           string   `json:"title"`
 	Description     string   `json:"description"`
 	VenueName       string   `json:"venue_name"`

@@ -41,6 +41,12 @@ type AdminEventStats struct {
 	RejectedEvents  int
 }
 
+type PendingEventRow struct {
+	Event          models.Event
+	OrganizerName  string
+	CategoryName   *string
+}
+
 func NewEventRepository(db *pgxpool.Pool) *EventRepository {
 	return &EventRepository{db: db}
 }
@@ -265,14 +271,19 @@ func (r *EventRepository) ListPublished(ctx context.Context) ([]models.Event, er
 	return events, rows.Err()
 }
 
-func (r *EventRepository) ListPending(ctx context.Context) ([]models.Event, error) {
+func (r *EventRepository) ListPending(ctx context.Context) ([]PendingEventRow, error) {
 	query := `
-		SELECT id, organizer_id, category_id, title, description, venue_name, address,
-		       event_date, start_time, end_time, capacity, image_url, latitude, longitude,
-		       status, rejection_reason, created_at, updated_at
-		FROM events
-		WHERE status = 'pending'
-		ORDER BY created_at ASC
+		SELECT
+			e.id, e.organizer_id, e.category_id, e.title, e.description, e.venue_name, e.address,
+			e.event_date, e.start_time, e.end_time, e.capacity, e.image_url, e.latitude, e.longitude,
+			e.status, e.rejection_reason, e.created_at, e.updated_at,
+			u.full_name AS organizer_name,
+			c.name AS category_name
+		FROM events e
+		LEFT JOIN users u ON u.id = e.organizer_id
+		LEFT JOIN categories c ON c.id = e.category_id
+		WHERE e.status = 'pending'
+		ORDER BY e.created_at ASC
 	`
 
 	rows, err := r.db.Query(ctx, query)
@@ -281,37 +292,42 @@ func (r *EventRepository) ListPending(ctx context.Context) ([]models.Event, erro
 	}
 	defer rows.Close()
 
-	events := make([]models.Event, 0)
+	items := make([]PendingEventRow, 0)
 	for rows.Next() {
-		var event models.Event
+		var row PendingEventRow
 		if err := rows.Scan(
-			&event.ID,
-			&event.OrganizerID,
-			&event.CategoryID,
-			&event.Title,
-			&event.Description,
-			&event.VenueName,
-			&event.Address,
-			&event.EventDate,
-			&event.StartTime,
-			&event.EndTime,
-			&event.Capacity,
-			&event.ImageURL,
-			&event.Latitude,
-			&event.Longitude,
-			&event.Status,
-			&event.RejectionReason,
-			&event.CreatedAt,
-			&event.UpdatedAt,
+			&row.Event.ID,
+			&row.Event.OrganizerID,
+			&row.Event.CategoryID,
+			&row.Event.Title,
+			&row.Event.Description,
+			&row.Event.VenueName,
+			&row.Event.Address,
+			&row.Event.EventDate,
+			&row.Event.StartTime,
+			&row.Event.EndTime,
+			&row.Event.Capacity,
+			&row.Event.ImageURL,
+			&row.Event.Latitude,
+			&row.Event.Longitude,
+			&row.Event.Status,
+			&row.Event.RejectionReason,
+			&row.Event.CreatedAt,
+			&row.Event.UpdatedAt,
+			&row.OrganizerName,
+			&row.CategoryName,
 		); err != nil {
 			return nil, err
 		}
-		events = append(events, event)
+		items = append(items, row)
 	}
-	return events, rows.Err()
+	return items, rows.Err()
 }
 
-func (r *EventRepository) ListPublishedFiltered(ctx context.Context, filter EventListFilter) ([]models.Event, error) {
+func (r *EventRepository) ListPublishedFiltered(
+	ctx context.Context, 
+	filter EventListFilter,
+	) ([]models.Event, error) {
 	query := `
 		SELECT id, organizer_id, category_id, title, description, venue_name, address,
 		       event_date, start_time, end_time, capacity, image_url, latitude, longitude,
@@ -376,7 +392,9 @@ func (r *EventRepository) ListPublishedFiltered(ctx context.Context, filter Even
 			&event.RejectionReason,
 			&event.CreatedAt,
 			&event.UpdatedAt,
-		); err != nil {
+		); 
+		
+		err != nil {
 			return nil, err
 		}
 		events = append(events, event)

@@ -238,6 +238,27 @@ func (h *EventHandler) CloseRegistrationMine(w http.ResponseWriter, r *http.Requ
 	utils.Success(w, http.StatusOK, "Registration closed", res)
 }
 
+func (h *EventHandler) ReopenRegistrationMine(w http.ResponseWriter, r *http.Request) {
+	userID := middleware.GetUserID(r.Context())
+	eventID := chi.URLParam(r, "id")
+
+	res, err := h.eventService.ReopenRegistrationMine(r.Context(), userID, eventID)
+	if err != nil {
+		if errors.Is(err, repository.ErrEventNotFound) {
+			utils.Error(w, http.StatusNotFound, "Event not found", nil)
+			return
+		}
+		if errors.Is(err, service.ErrForbiddenEventAccess) {
+			utils.Error(w, http.StatusForbidden, err.Error(), nil)
+			return
+		}
+		utils.Error(w, http.StatusBadRequest, err.Error(), nil)
+		return
+	}
+
+	utils.Success(w, http.StatusOK, "Registration reopened", res)
+}
+
 func (h *EventHandler) OrganizerDashboard(w http.ResponseWriter, r *http.Request) {
 	userID := middleware.GetUserID(r.Context())
 

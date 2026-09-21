@@ -23,6 +23,7 @@ type Dependencies struct {
 	NotificationHandler *handler.NotificationHandler
 	AdminUserHandler *handler.AdminUserHandler
 	AdminDashboardHandler *handler.AdminDashboardHandler
+	UploadHandler *handler.UploadHandler
 	TokenManager *auth.TokenManager
 }
 
@@ -46,6 +47,9 @@ func NewRouter(deps Dependencies) http.Handler {
 			"status": "ok",
 		})
 	})
+
+	// Serve local uploaded images
+	r.Handle("/uploads/*", http.StripPrefix("/uploads/", http.FileServer(http.Dir("uploads"))))
 
 	r.Route("/api/v1", func(api chi.Router) {
 		api.Route("/auth", func(authRoute chi.Router) {
@@ -72,6 +76,7 @@ func NewRouter(deps Dependencies) http.Handler {
 			org.Post("/events", deps.EventHandler.Create)
 			org.Post("/events/{id}/cancel", deps.EventHandler.CancelMine)
             org.Post("/events/{id}/close-registration", deps.EventHandler.CloseRegistrationMine)
+			org.Post("/events/{id}/reopen-registration", deps.EventHandler.ReopenRegistrationMine)
 			org.Get("/events", deps.EventHandler.ListMine)
 			org.Get("/events/{id}", deps.EventHandler.GetMine)
 			org.Get("/events/{id}/registrations", deps.RegistrationHandler.ListByEventForOrganizer)
@@ -124,6 +129,11 @@ func NewRouter(deps Dependencies) http.Handler {
 			private.Use(middleware.AuthRequired(deps.TokenManager))
 			private.Get("/me/saved-events", deps.SavedEventHandler.ListMine)
 			private.Get("/me/registrations", deps.RegistrationHandler.ListMine)
+		})
+
+		api.Group(func(private chi.Router) {
+			private.Use(middleware.AuthRequired(deps.TokenManager))
+			private.Post("/uploads/image", deps.UploadHandler.UploadImage)
 		})
 
 		api.Get("/events/{id}/reviews", deps.ReviewHandler.ListByEvent)

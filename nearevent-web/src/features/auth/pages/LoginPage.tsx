@@ -5,6 +5,7 @@ import Button from "../../../components/ui/Button";
 import Input from "../../../components/ui/Input";
 import Logo from "../../../components/ui/Logo";
 import { useAuthStore } from "../../../store/authStore";
+import ForgotPasswordModal from "../components/ForgotPasswordModal";
 import { useLocation } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 
@@ -23,6 +24,8 @@ export default function LoginPage() {
   const [passwordError, setPasswordError] = useState("");
   const [formError, setFormError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const [forgotOpen, setForgotOpen] = useState(false);
 
   const validate = () => {
     let valid = true;
@@ -158,12 +161,13 @@ export default function LoginPage() {
             ) : null}
 
             <div className="mt-2 text-left">
-              <Link
-                to="/forgot-password"
+              <button
+                type="button"
+                onClick={() => setForgotOpen(true)}
                 className="text-sm text-brand-primary hover:underline"
               >
                 Forgot password?
-              </Link>
+              </button>
             </div>
           </div>
 
@@ -183,6 +187,11 @@ export default function LoginPage() {
           </Link>
         </p>
       </div>
+      {/* ✅ put modal here */}
+    <ForgotPasswordModal
+      open={forgotOpen}
+      onClose={() => setForgotOpen(false)}
+    />
     </div>
   );
 }

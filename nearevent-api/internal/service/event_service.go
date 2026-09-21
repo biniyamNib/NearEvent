@@ -187,15 +187,22 @@ func mapEventResponse(event *models.Event) dto.EventResponse {
 	}
 }
 
+func mapEventResponseWithMeta(event *models.Event, organizerName string, categoryName *string) dto.EventResponse {
+	resp := mapEventResponse(event)
+	resp.OrganizerName = organizerName
+	resp.CategoryName = categoryName
+	return resp
+}
+
 func (s *EventService) ListPending(ctx context.Context) ([]dto.EventResponse, error) {
-	events, err := s.events.ListPending(ctx)
+	rows, err := s.events.ListPending(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	result := make([]dto.EventResponse, 0, len(events))
-	for _, e := range events {
-		result = append(result, mapEventResponse(&e))
+	result := make([]dto.EventResponse, 0, len(rows))
+	for _, row := range rows {
+		result = append(result, mapEventResponseWithMeta(&row.Event, row.OrganizerName, row.CategoryName))
 	}
 	return result, nil
 }
@@ -306,7 +313,8 @@ func (s *EventService) RequestChanges(ctx context.Context, eventID string, reaso
 }
 
 func (s *EventService) ListPublished(ctx context.Context, q, categoryID, dateFrom, dateTo string) ([]dto.EventResponse, error) {
-	events, err := s.events.ListPublishedFiltered(ctx, repository.EventListFilter{
+	events, err := s.events.ListPublishedFiltered(
+		ctx, repository.EventListFilter{
 		Query:      q,
 		CategoryID: categoryID,
 		DateFrom:   dateFrom,
@@ -503,6 +511,39 @@ func (s *EventService) CloseRegistrationMine(ctx context.Context, organizerID, e
 	}
 
 	event.Status = models.EventStatusRegistrationClosed
+	event.UpdatedAt = time.Now().UTC()
+
+	if err := s.events.Update(ctx, event); err != nil {
+		return nil, err
+	}
+
+	resp := mapEventResponse(event)
+	return &resp, nil
+}
+
+func (s *EventService) ReopenRegistrationMine(ctx context.Context, organizerID, eventID string) (*dto.EventResponse, error) {
+	orgID, err := uuid.Parse(organizerID)
+	if err != nil {
+		return nil, errors.New("invalid organizer id")
+	}
+	eID, err := uuid.Parse(eventID)
+	if err != nil {
+		return nil, errors.New("invalid event id")
+	}
+
+	event, err := s.events.GetByID(ctx, eID)
+	if err != nil {
+		return nil, err
+	}
+	if event.OrganizerID != orgID {
+		return nil, ErrForbiddenEventAccess
+	}
+
+	if event.Status != models.EventStatusRegistrationClosed {
+		return nil, errors.New("only registration_closed events can reopen registration")
+	}
+
+	event.Status = models.EventStatusPublished
 	event.UpdatedAt = time.Now().UTC()
 
 	if err := s.events.Update(ctx, event); err != nil {

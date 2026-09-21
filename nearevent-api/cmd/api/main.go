@@ -58,6 +58,8 @@ func main() {
 	reviewService := service.NewReviewService(reviewRepo, eventRepo, regRepo)
 	adminUserService := service.NewAdminUserService(userRepo)
 	adminDashboardService := service.NewAdminDashboardService(eventRepo, userRepo)
+	uploadService := service.NewUploadService("uploads")
+	uploadHandler := handler.NewUploadHandler(uploadService)
 
 	// Handlers
 	authHandler := handler.NewAuthHandler(authService)
@@ -80,6 +82,7 @@ func main() {
 		NotificationHandler: notificationHandler,
 		AdminUserHandler:    adminUserHandler,
 		AdminDashboardHandler: adminDashboardHandler,
+		UploadHandler: uploadHandler,
 		TokenManager:        tokenManager,
 	})
 
