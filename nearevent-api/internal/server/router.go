@@ -105,6 +105,7 @@ func NewRouter(deps Dependencies) http.Handler {
 			admin.Post("/users/{id}/suspend", deps.AdminUserHandler.Suspend)
 			admin.Post("/users/{id}/activate", deps.AdminUserHandler.Activate)
 			admin.Get("/dashboard", deps.AdminDashboardHandler.Get)
+			admin.Delete("/categories/{id}", deps.CategoryHandler.Delete)
 		})
 
 		api.Get("/events", deps.EventHandler.ListPublished)

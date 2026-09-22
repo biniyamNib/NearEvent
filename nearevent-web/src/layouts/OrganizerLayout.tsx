@@ -10,6 +10,14 @@ export default function OrganizerLayout() {
   const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
 
+  const API_ORIGIN = "http://localhost:8080";
+
+  const avatarSrc = user?.avatar_url
+    ? user.avatar_url.startsWith("http") || user.avatar_url.startsWith("blob:")
+      ? user.avatar_url
+      : `${API_ORIGIN}${user.avatar_url}`
+    : null;
+
   const initials =
     user?.full_name
       ?.split(" ")
@@ -17,6 +25,8 @@ export default function OrganizerLayout() {
       .join("")
       .slice(0, 2)
       .toUpperCase() || "U";
+
+
 
   const handleLogout = () => {
     logout();
@@ -33,8 +43,16 @@ export default function OrganizerLayout() {
           <Button onClick={() => navigate("/organizer/events/create")}>
             Create Event
           </Button>
-          <div className="h-9 w-9 rounded-full bg-brand-primary-light text-brand-primary flex items-center justify-center text-sm font-semibold">
-            {initials}
+          <div className="h-9 w-9 overflow-hidden rounded-full bg-brand-primary-light text-brand-primary flex items-center justify-center text-sm font-semibold">
+            {avatarSrc ? (
+              <img
+                src={avatarSrc}
+                alt={user?.full_name || "Profile"}
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              initials
+            )}
           </div>
         </div>
       </header>

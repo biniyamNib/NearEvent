@@ -121,3 +121,19 @@ func NewCategory(name string) *models.Category {
 		UpdatedAt: now,
 	}
 }
+
+func (r *CategoryRepository) Delete(ctx context.Context, id uuid.UUID) error {
+	_, err := r.db.Exec(ctx, `UPDATE events SET category_id = NULL WHERE category_id = $1`, id)
+	if err != nil {
+		return err
+	}
+
+	cmd, err := r.db.Exec(ctx, `DELETE FROM categories WHERE id = $1`, id)
+	if err != nil {
+		return err
+	}
+	if cmd.RowsAffected() == 0 {
+		return ErrCategoryNotFound
+	}
+	return nil
+}

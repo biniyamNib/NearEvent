@@ -6,9 +6,9 @@ type CreateEventRequest struct {
 	CategoryID  *string  `json:"category_id,omitempty"`
 	VenueName   string   `json:"venue_name"`
 	Address     string   `json:"address"`
-	EventDate   string   `json:"event_date"` // YYYY-MM-DD
-	StartTime   string   `json:"start_time"` // HH:MM
-	EndTime     string   `json:"end_time"`   // HH:MM
+	EventDate   string   `json:"event_date"` 
+	StartTime   string   `json:"start_time"` 
+	EndTime     string   `json:"end_time"`   
 	Capacity    int      `json:"capacity"`
 	ImageURL    *string  `json:"image_url,omitempty"`
 	Latitude    *float64 `json:"latitude,omitempty"`
@@ -33,6 +33,7 @@ type UpdateEventRequest struct {
 type EventResponse struct {
 	ID              string   `json:"id"`
 	OrganizerID     string   `json:"organizer_id"`
+	OrganizerName   string   `json:"organizer_name,omitempty"`
 	CategoryID      *string  `json:"category_id,omitempty"`
 	CategoryName    *string  `json:"category_name,omitempty"`
 	Title           string   `json:"title"`

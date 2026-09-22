@@ -489,3 +489,4 @@ func (r *EventRepository) GetAdminEventStats(ctx context.Context) (*AdminEventSt
 	}
 	return &stats, nil
 }
+

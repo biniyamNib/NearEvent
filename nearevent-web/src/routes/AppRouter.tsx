@@ -11,6 +11,11 @@ import EventDetailsPage from "../features/organizer/events/EventDetailsPage";
 import EditEventPage from "../features/organizer/events/EditEventPage";
 import OrganizerSettingsPage from "../features/organizer/settings/OrganizerSettingsPage";
 import AdminLayout from "../layouts/AdminLayout";
+import ReviewEventPage from "../features/admin/moderation/ReviewEventPage";
+import AdminCategoriesPage from "../features/admin/categories/AdminCategoriesPage";
+import AdminUsersPage from "../features/admin/users/AdminUsersPage";
+import AdminUserDetailsPage from "../features/admin/users/AdminUserDetailsPage";
+import AdminSettingsPage from "../features/admin/settings/AdminSettingsPage";
 
 export default function AppRouter() {
   return (
@@ -32,6 +37,11 @@ export default function AppRouter() {
           <Route element={<RoleRoute allow={["admin"]} />}>
             <Route element={<AdminLayout/>}>
               <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
+              <Route path="/admin/events/:id" element={<ReviewEventPage />} />
+              <Route path="/admin/categories" element={<AdminCategoriesPage />} />
+              <Route path="/admin/users" element={<AdminUsersPage />} />
+              <Route path="/admin/users/:id" element={<AdminUserDetailsPage />} />
+              <Route path="/admin/settings" element={<AdminSettingsPage />} />
             </Route>
           </Route>
         </Route>

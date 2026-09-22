@@ -127,3 +127,16 @@ func mapCategoryResponse(c *models.Category) dto.CategoryResponse {
 		UpdatedAt: c.UpdatedAt.Format(time.RFC3339),
 	}
 }
+
+func (s *CategoryService) Delete(ctx context.Context, id string) error {
+	categoryID, err := uuid.Parse(id)
+	if err != nil {
+		return errors.New("invalid category id")
+	}
+
+	if _, err := s.categories.GetByID(ctx, categoryID); err != nil {
+		return err
+	}
+
+	return s.categories.Delete(ctx, categoryID)
+}

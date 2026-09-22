@@ -95,3 +95,18 @@ func (h *CategoryHandler) SetStatus(w http.ResponseWriter, r *http.Request) {
 	}
 	utils.Success(w, http.StatusOK, "Category status updated", res)
 }
+
+func (h *CategoryHandler) Delete(w http.ResponseWriter, r *http.Request) {
+	id := chi.URLParam(r, "id")
+
+	if err := h.service.Delete(r.Context(), id); err != nil {
+		if errors.Is(err, repository.ErrCategoryNotFound) {
+			utils.Error(w, http.StatusNotFound, "Category not found", nil)
+			return
+		}
+		utils.Error(w, http.StatusBadRequest, err.Error(), nil)
+		return
+	}
+
+	utils.Success(w, http.StatusOK, "Category deleted", nil)
+}

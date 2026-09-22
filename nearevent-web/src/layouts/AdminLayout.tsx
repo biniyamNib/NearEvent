@@ -16,13 +16,21 @@ export default function AdminLayout() {
   const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
 
+  const API_ORIGIN = "http://localhost:8080";
+
+  const avatarSrc = user?.avatar_url
+    ? user.avatar_url.startsWith("http") || user.avatar_url.startsWith("blob:")
+      ? user.avatar_url
+      : `${API_ORIGIN}${user.avatar_url}`
+    : null;
+
   const initials =
     user?.full_name
       ?.split(" ")
       .map((n) => n[0])
       .join("")
       .slice(0, 2)
-      .toUpperCase() || "A";
+      .toUpperCase() || "U";
 
   const handleLogout = () => {
     logout();
@@ -33,8 +41,16 @@ export default function AdminLayout() {
     <div className="h-screen overflow-hidden bg-bg-page flex flex-col">
       <header className="h-16 shrink-0 border-b border-border-default bg-bg-default px-4 md:px-6 flex items-center justify-between">
         <Logo className="text-xl" />
-        <div className="h-9 w-9 rounded-full bg-brand-primary-light text-brand-primary flex items-center justify-center text-sm font-semibold">
-          {initials}
+        <div className="h-9 w-9 overflow-hidden rounded-full bg-brand-primary-light text-brand-primary flex items-center justify-center text-sm font-semibold">
+          {avatarSrc ? (
+            <img
+              src={avatarSrc}
+              alt={user?.full_name || "Profile"}
+              className="h-full w-full object-cover"
+            />
+          ) : (
+            initials
+          )}
         </div>
       </header>
 
