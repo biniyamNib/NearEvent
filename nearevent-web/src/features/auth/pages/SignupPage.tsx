@@ -7,7 +7,7 @@ import Input from "../../../components/ui/Input";
 import Logo from "../../../components/ui/Logo";
 import { useAuthStore } from "../../../store/authStore";
 
-export default function RegisterPage() {
+export default function SignupPage() {
   const navigate = useNavigate();
   const setAuth = useAuthStore((s) => s.setAuth);
 

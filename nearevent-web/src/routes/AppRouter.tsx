@@ -1,6 +1,6 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import LoginPage from "../features/auth/pages/LoginPage";
-import RegisterPage from "../features/auth/pages/RegisterPage";
+import SignupPage from "../features/auth/pages/SignupPage";
 import OrganizerDashboardPage from "../features/organizer/dashboard/OrganizerDashboardPage";
 import AdminDashboardPage from "../features/admin/dashboard/AdminDashboardPage";
 import ProtectedRoute from "./ProtectedRoute";
@@ -22,7 +22,7 @@ export default function AppRouter() {
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/register" element={<SignupPage />} />
         <Route element={<ProtectedRoute />}>
           <Route element={<RoleRoute allow={["organizer"]} />}>
             <Route element={<OrganizerLayout />}>
