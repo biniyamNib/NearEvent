@@ -19,6 +19,12 @@ export type RegisterPayload = {
   role?: "organizer" | "attendee";
 };
 
+export type UpdateProfilePayload = {
+  full_name: string;
+  email: string;
+  avatar_url?: string;
+}
+
 export const login = async (payload: LoginPayload) => {
   const res = await api.post<ApiSuccess<AuthResponse>>("/auth/login", payload);
   return res.data.data;
@@ -34,11 +40,7 @@ export const getMe = async () => {
   return res.data.data;
 };
 
-export const updateProfile = async (payload: {
-  full_name: string;
-  email: string;
-  avatar_url?: string;
-}) => {
+export const updateProfile = async (payload: UpdateProfilePayload) => {
   const res = await api.put("/users/me", payload);
   return res.data.data;
 };

@@ -68,7 +68,7 @@ export default function LoginPage() {
       });
 
       const elapsed = Date.now() - start;
-      const minLoadingTime = 800; // ms
+      const minLoadingTime = 800;
       if (elapsed < minLoadingTime) {
         await new Promise((resolve) => setTimeout(resolve, minLoadingTime - elapsed));
       }

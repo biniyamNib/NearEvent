@@ -26,6 +26,19 @@ export type EventItem = {
   capacity: number;
 };
 
+export type CreateEventPayload = {
+  title: string;
+  description: string;
+  category_id?: string;
+  venue_name: string;
+  address: string;
+  event_date: string;
+  start_time: string; 
+  end_time: string;   
+  capacity: number;
+  image_url?: string;
+};
+
 export const getOrganizerDashboard = async () => {
   const res = await api.get<ApiSuccess<OrganizerDashboardStats>>("/organizer/dashboard");
   return res.data.data;
@@ -34,19 +47,6 @@ export const getOrganizerDashboard = async () => {
 export const getOrganizerEvents = async () => {
   const res = await api.get<ApiSuccess<EventItem[]>>("/organizer/events");
   return res.data.data;
-};
-
-export type CreateEventPayload = {
-  title: string;
-  description: string;
-  category_id?: string;
-  venue_name: string;
-  address: string;
-  event_date: string; // YYYY-MM-DD
-  start_time: string; // HH:MM
-  end_time: string;   // HH:MM
-  capacity: number;
-  image_url?: string;
 };
 
 export const createEvent = async (payload: CreateEventPayload) => {

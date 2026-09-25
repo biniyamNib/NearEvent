@@ -337,16 +337,13 @@ func (s *EventService) GetPublished(ctx context.Context, eventID string) (*dto.E
 		return nil, errors.New("invalid event id")
 	}
 
-	event, err := s.events.GetByID(ctx, eID)
+	row, err := s.events.GetPublishedByID(ctx, eID)
 	if err != nil {
 		return nil, err
 	}
 
-	if event.Status != models.EventStatusPublished && event.Status != models.EventStatusRegistrationClosed {
-		return nil, repository.ErrEventNotFound
-	}
-
-	resp := mapEventResponse(event)
+	resp := mapEventResponseWithMeta(&row.Event, row.OrganizerName, row.CategoryName)
+	resp.OrganizerAvatarURL = row.OrganizerAvatarURL
 	return &resp, nil
 }
 

@@ -33,7 +33,8 @@ type UpdateEventRequest struct {
 type EventResponse struct {
 	ID              string   `json:"id"`
 	OrganizerID     string   `json:"organizer_id"`
-	OrganizerName   string   `json:"organizer_name,omitempty"`
+	OrganizerName   string   `json:"organizer_name"`
+	OrganizerAvatarURL *string `json:"organizer_avatar_url,omitempty"`
 	CategoryID      *string  `json:"category_id,omitempty"`
 	CategoryName    *string  `json:"category_name,omitempty"`
 	Title           string   `json:"title"`

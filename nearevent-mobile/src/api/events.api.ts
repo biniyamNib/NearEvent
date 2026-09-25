@@ -23,3 +23,28 @@ export const getPublishedEvents = async (params?: {
   const res = await api.get("/events", { params });
   return res.data.data as EventItem[];
 };
+
+export const getEventById = async (id: string) => {
+  const res = await api.get(`/events/${id}`);
+  return res.data.data;
+};
+
+export const rsvpEvent = async (id: string) => {
+  const res = await api.post(`/events/${id}/rsvp`);
+  return res.data.data;
+};
+
+export const cancelRsvp = async (id: string) => {
+  const res = await api.delete(`/events/${id}/rsvp`);
+  return res.data.data;
+};
+
+export const saveEvent = async (id: string) => {
+  const res = await api.post(`/events/${id}/save`);
+  return res.data.data;
+};
+
+export const unsaveEvent = async (id: string) => {
+  const res = await api.delete(`/events/${id}/save`);
+  return res.data.data;
+};
