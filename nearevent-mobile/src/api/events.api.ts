@@ -24,6 +24,16 @@ export const getPublishedEvents = async (params?: {
   return res.data.data as EventItem[];
 };
 
+export const getMyRegisteredEvents = async () => {
+  const res = await api.get("/users/me/registrations"); // adjust if your path differs
+  return res.data.data;
+};
+
+export const getMySavedEvents = async () => {
+  const res = await api.get("/users/me/saved-events"); // adjust if your path differs
+  return res.data.data;
+};
+
 export const getEventById = async (id: string) => {
   const res = await api.get(`/events/${id}`);
   return res.data.data;

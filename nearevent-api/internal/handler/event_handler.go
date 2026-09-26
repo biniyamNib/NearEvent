@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net/http"
 
+	"nearevent-api/internal/auth"
 	"nearevent-api/internal/dto"
 	"nearevent-api/internal/middleware"
 	"nearevent-api/internal/repository"
@@ -16,10 +17,14 @@ import (
 
 type EventHandler struct {
 	eventService *service.EventService
+	tokens       *auth.TokenManager
 }
 
-func NewEventHandler(eventService *service.EventService) *EventHandler {
-	return &EventHandler{eventService: eventService}
+func NewEventHandler(eventService *service.EventService, tokens *auth.TokenManager) *EventHandler {
+	return &EventHandler{
+		eventService: eventService,
+		tokens:       tokens,
+	}
 }
 
 func (h *EventHandler) Create(w http.ResponseWriter, r *http.Request) {
@@ -156,7 +161,9 @@ func (h *EventHandler) ListPublished(w http.ResponseWriter, r *http.Request) {
 func (h *EventHandler) GetPublished(w http.ResponseWriter, r *http.Request) {
 	eventID := chi.URLParam(r, "id")
 
-	res, err := h.eventService.GetPublished(r.Context(), eventID)
+	userID := middleware.OptionalUserID(r, h.tokens)
+
+	res, err := h.eventService.GetPublished(r.Context(), eventID, userID)
 	if err != nil {
 		if errors.Is(err, repository.ErrEventNotFound) {
 			utils.Error(w, http.StatusNotFound, "Event not found", nil)

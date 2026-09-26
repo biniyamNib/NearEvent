@@ -50,6 +50,8 @@ type EventResponse struct {
 	Longitude       *float64 `json:"longitude,omitempty"`
 	Status          string   `json:"status"`
 	RejectionReason *string  `json:"rejection_reason,omitempty"`
+	IsRegistered    bool     `json:"is_registered"`
+    IsSaved         bool     `json:"is_saved"`
 	CreatedAt       string   `json:"created_at"`
 	UpdatedAt       string   `json:"updated_at"`
 }

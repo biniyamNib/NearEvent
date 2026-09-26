@@ -37,6 +37,8 @@ export type CreateEventPayload = {
   end_time: string;   
   capacity: number;
   image_url?: string;
+  latitude?: number;
+  longitude?: number;
 };
 
 export const getOrganizerDashboard = async () => {

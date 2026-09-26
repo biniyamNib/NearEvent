@@ -42,6 +42,22 @@ func AuthRequired(tokenManager *auth.TokenManager) func(http.Handler) http.Handl
 	}
 }
 
+func OptionalUserID(r *http.Request, tokenManager *auth.TokenManager) string {
+	if tokenManager == nil {
+		return ""
+	}
+	header := r.Header.Get("Authorization")
+	if header == "" || !strings.HasPrefix(header, "Bearer ") {
+		return ""
+	}
+	tokenStr := strings.TrimPrefix(header, "Bearer ")
+	claims, err := tokenManager.Parse(tokenStr)
+	if err != nil {
+		return ""
+	}
+	return claims.UserID.String()
+}
+
 func GetUserID(ctx context.Context) string {
 	if v := ctx.Value(ContextUserID); v != nil {
 		return v.(string)

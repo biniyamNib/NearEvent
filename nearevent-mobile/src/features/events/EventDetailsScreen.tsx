@@ -334,43 +334,29 @@ export default function EventDetailsScreen({ navigation, route }: Props) {
 
           {/* Map */}
           {hasCoords ? (
-            <>
-              <MapView
-                style={{ marginTop: 16, height: 160, borderRadius: 12 }}
-                initialRegion={{
-                  latitude: Number(event.latitude),
-                  longitude: Number(event.longitude),
-                  latitudeDelta: 0.01,
-                  longitudeDelta: 0.01,
-                }}
-                scrollEnabled={false}
-                zoomEnabled={false}
-                pitchEnabled={false}
-                rotateEnabled={false}
-              >
-                <Marker
-                  coordinate={{
-                    latitude: Number(event.latitude),
-                    longitude: Number(event.longitude),
-                  }}
-                  title={event.title}
-                  description={event.venue_name || event.address}
-                />
-              </MapView>
-
-              <TouchableOpacity onPress={openInMaps}>
-                <Text
-                  style={{
-                    marginTop: 8,
-                    color: colors.brand.primary,
-                    fontWeight: "600",
-                  }}
-                >
-                  Open in Maps
-                </Text>
-              </TouchableOpacity>
-            </>
-          ) : (
+  <TouchableOpacity
+    onPress={openInMaps}
+    activeOpacity={0.9}
+    style={{
+      marginTop: 16,
+      height: 160,
+      borderRadius: 16,
+      backgroundColor: colors.background.subtle,
+      alignItems: "center",
+      justifyContent: "center",
+      borderWidth: 1,
+      borderColor: colors.border.default,
+    }}
+  >
+    <Ionicons name="map-outline" size={32} color={colors.brand.primary} />
+    <Text style={{ marginTop: 8, fontWeight: "600", color: colors.text.primary }}>
+      {event.venue_name || "Event location"}
+    </Text>
+    <Text style={{ marginTop: 4, color: colors.brand.primary, fontWeight: "600" }}>
+      Open in Maps
+    </Text>
+  </TouchableOpacity>
+) : (
             <View
               style={{
                 marginTop: 16,

@@ -34,6 +34,8 @@ export default function EditEventPage() {
   const [endTime, setEndTime] = useState("");
   const [venueName, setVenueName] = useState("");
   const [address, setAddress] = useState("");
+  const [latitude, setLatitude] = useState("");
+  const [longitude, setLongitude] = useState("");
   const [capacity, setCapacity] = useState("");
 
   const [bannerFile, setBannerFile] = useState<File | null>(null);
@@ -64,6 +66,8 @@ export default function EditEventPage() {
         setEndTime((event.end_time || "").slice(0, 5));
         setVenueName(event.venue_name || "");
         setAddress(event.address || "");
+        setLatitude(event.latitude != null ? String(event.latitude) : "");
+        setLongitude(event.longitude != null ? String(event.longitude) : "");
         setCapacity(String(event.capacity ?? ""));
       } catch (err: any) {
         setFormError(err?.response?.data?.message || "Failed to load event");
@@ -167,6 +171,8 @@ export default function EditEventPage() {
         end_time: endTime,
         capacity: Number(capacity),
         image_url: imageUrl,
+        latitude: latitude.trim() === "" ? undefined : Number(latitude),
+        longitude: longitude.trim() === "" ? undefined : Number(longitude),
       });
 
       const elapsed = Date.now() - start;
@@ -339,6 +345,25 @@ export default function EditEventPage() {
                 error={errors.address}
                 disabled={saving}
               />
+
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <Input
+                  label="Latitude (optional)"
+                  type="number"
+                  value={latitude}
+                  onChange={(e) => setLatitude(e.target.value)}
+                  placeholder="e.g. 9.0192"
+                  disabled={saving}
+                />
+                <Input
+                  label="Longitude (optional)"
+                  type="number"
+                  value={longitude}
+                  onChange={(e) => setLongitude(e.target.value)}
+                  placeholder="e.g. 38.7525"
+                  disabled={saving}
+                />
+              </div>
             </section>
 
             <section className="rounded-2xl border border-border-default bg-bg-default p-5 space-y-4">
@@ -356,7 +381,6 @@ export default function EditEventPage() {
                 disabled={saving}
               />
 
-              {/* Banner upload */}
               <div>
                 <label className="mb-2 block text-sm text-text-secondary">
                   Event Banner Image (optional)
@@ -366,7 +390,7 @@ export default function EditEventPage() {
                   <div
                     onDragOver={(e) => e.preventDefault()}
                     onDrop={onBannerDrop}
-                    className="rounded-xl h-31 border border-dashed border-border-default bg-bg-subtle p-4 text-center"
+                    className="rounded-xl border border-dashed border-border-default bg-bg-subtle p-4 text-center"
                   >
                     <input
                       id="edit-banner-upload"
