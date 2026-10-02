@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"strings"
+	"fmt"
+	"os"
 
 	"crypto/rand"
 	"crypto/sha256"
@@ -15,6 +17,7 @@ import (
 	"nearevent-api/internal/models"
 	"nearevent-api/internal/repository"
 	"nearevent-api/internal/utils"
+	"nearevent-api/internal/email"
 
 	"github.com/google/uuid"
 )
@@ -159,19 +162,24 @@ func mapUserResponse(user *models.User) dto.UserResponse {
 }
 
 func (s *AuthService) ForgotPassword(ctx context.Context, req dto.ForgotPasswordRequest) (string, error) {
-	email := utils.NormalizeEmail(req.Email)
-	if err := utils.ValidateEmail(email); err != nil {
+	emailAddr := utils.NormalizeEmail(req.Email)
+	if err := utils.ValidateEmail(emailAddr); err != nil {
 		return "", err
 	}
 
-	user, err := s.users.GetByEmail(ctx, email)
+	user, err := s.users.GetByEmail(ctx, emailAddr)
 	if err != nil {
 		if errors.Is(err, repository.ErrUserNotFound) {
-			// Do not reveal whether email exists
+			// Still return success to client (don't reveal missing emails)
 			return "", nil
 		}
 		return "", err
 	}
+
+	// Optional: attendee-only for mobile public reset
+	// if user.Role != "attendee" {
+	// 	return "", nil
+	// }
 
 	rawToken, err := generateResetToken()
 	if err != nil {
@@ -185,8 +193,19 @@ func (s *AuthService) ForgotPassword(ctx context.Context, req dto.ForgotPassword
 		return "", err
 	}
 
-	// MVP only: return token for testing without email service
-	return rawToken, nil
+	base := os.Getenv("APP_RESET_URL")
+	if base == "" {
+		base = "http://localhost:5173/reset-password"
+	}
+	link := base + "?token=" + rawToken
+
+	err = email.SendPasswordReset(user.Email, link)
+	if err != nil {
+		fmt.Println("RESEND ERROR:", err)
+	} else {
+		fmt.Println("RESEND OK for", user.Email, link)
+	}
+	return "", nil
 }
 
 func (s *AuthService) ResetPassword(ctx context.Context, req dto.ResetPasswordRequest) error {

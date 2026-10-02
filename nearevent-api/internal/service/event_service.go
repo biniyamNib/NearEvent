@@ -22,17 +22,20 @@ var (
 type EventService struct {
 	events        *repository.EventRepository
 	regs          *repository.RegistrationRepository
+	saved		  *repository.SavedEventRepository
 	notifications *NotificationService
 }
 
 func NewEventService(
 	events *repository.EventRepository,
 	regs *repository.RegistrationRepository,
+	saved *repository.SavedEventRepository,
 	notifications *NotificationService,
 ) *EventService {
 	return &EventService{
 		events:        events,
 		regs:          regs,
+		saved:		   saved,
 		notifications: notifications,
 	}
 }
@@ -331,22 +334,39 @@ func (s *EventService) ListPublished(ctx context.Context, q, categoryID, dateFro
 	return result, nil
 }
 
-func (s *EventService) GetPublished(ctx context.Context, eventID string) (*dto.EventResponse, error) {
+func (s *EventService) GetPublished(ctx context.Context, eventID string, userID string) (*dto.EventResponse, error) {
 	eID, err := uuid.Parse(eventID)
 	if err != nil {
 		return nil, errors.New("invalid event id")
 	}
 
-	event, err := s.events.GetByID(ctx, eID)
+	row, err := s.events.GetPublishedByID(ctx, eID)
 	if err != nil {
 		return nil, err
 	}
 
-	if event.Status != models.EventStatusPublished && event.Status != models.EventStatusRegistrationClosed {
-		return nil, repository.ErrEventNotFound
+	resp := mapEventResponseWithMeta(&row.Event, row.OrganizerName, row.CategoryName)
+	resp.OrganizerAvatarURL = row.OrganizerAvatarURL
+
+	// Optional: flags for logged-in attendee
+	if strings.TrimSpace(userID) != "" {
+		uid, err := uuid.Parse(userID)
+		if err == nil {
+			if s.saved != nil {
+				saved, err := s.saved.IsSaved(ctx, uid, row.Event.ID)
+				if err == nil {
+					resp.IsSaved = saved
+				}
+			}
+			if s.regs != nil {
+				status, err := s.regs.Get(ctx, uid, row.Event.ID)
+				if err == nil && status == "registered" {
+					resp.IsRegistered = true
+				}
+			}
+		}
 	}
 
-	resp := mapEventResponse(event)
 	return &resp, nil
 }
 

@@ -1,9 +1,9 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
-import HomeScreen from "../features/discovery/HomeScreen";
 import SearchScreen from "../features/discovery/SearchScreen";
 import MyEventsScreen from "../features/myEvents/MyEventsScreen";
-import ProfileScreen from "../features/profile/ProfileScreen";
+import HomeStack from "./HomeStack";
+import ProfileStack from "./ProfileStack";
 import { colors } from "../theme/colors";
 
 export type MainTabParamList = {
@@ -37,10 +37,22 @@ export default function MainTabNavigator() {
         },
       })}
     >
-      <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="Search" component={SearchScreen} options={{ title: "Search" }} />
-      <Tab.Screen name="MyEvents" component={MyEventsScreen} options={{ title: "My Events" }} />
-      <Tab.Screen name="Profile" component={ProfileScreen} />
+      <Tab.Screen name="Home" component={HomeStack} />
+      <Tab.Screen
+        name="Search"
+        component={SearchScreen}
+        options={{ title: "Search", tabBarStyle: { display: "none" } }}
+      />
+      <Tab.Screen
+        name="MyEvents"
+        component={MyEventsScreen}
+        options={{ title: "My Events" }}
+      />
+      <Tab.Screen
+        name="Profile"
+        component={ProfileStack}
+        options={{ title: "Profile" }}
+      />
     </Tab.Navigator>
   );
 }

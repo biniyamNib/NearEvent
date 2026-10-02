@@ -23,6 +23,9 @@ type Config struct {
 	AdminEmail        string
 	AdminPassword     string
 	AdminName         string
+	ResendApiKey      string
+	EmailFrom         string
+	AppResetUrl       string
 }
 
 func Load() (*Config, error) {
@@ -48,6 +51,9 @@ func Load() (*Config, error) {
 		AdminEmail:        getEnv("ADMIN_EMAIL", "admin@nearevent.com"),
 		AdminPassword:     getEnv("ADMIN_PASSWORD", "Admin123!"),
 		AdminName:         getEnv("ADMIN_NAME", "Admin User"),
+		ResendApiKey:      getEnv("RESEND_API_KEY", ""),
+        EmailFrom:         getEnv("EMAIL_FROM", ""),
+		AppResetUrl:       getEnv("APP_RESET_URL", "http://localhost:5173/reset-password"),
 	}
 
 	return cfg, nil

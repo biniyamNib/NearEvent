@@ -51,7 +51,7 @@ func main() {
 	// Services
 	notificationService := service.NewNotificationService(notificationRepo)
 	authService := service.NewAuthService(userRepo, tokenManager)
-	eventService := service.NewEventService(eventRepo, regRepo, notificationService)
+	eventService := service.NewEventService(eventRepo, regRepo, savedRepo, notificationService)
 	savedService := service.NewSavedEventService(savedRepo, eventRepo)
 	regService := service.NewRegistrationService(regRepo, eventRepo, notificationService)
 	categoryService := service.NewCategoryService(categoryRepo)
@@ -63,7 +63,7 @@ func main() {
 
 	// Handlers
 	authHandler := handler.NewAuthHandler(authService)
-	eventHandler := handler.NewEventHandler(eventService)
+	eventHandler := handler.NewEventHandler(eventService, tokenManager)
 	savedHandler := handler.NewSavedEventHandler(savedService)
 	regHandler := handler.NewRegistrationHandler(regService)
 	categoryHandler := handler.NewCategoryHandler(categoryService)

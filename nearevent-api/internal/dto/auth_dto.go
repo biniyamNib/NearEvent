@@ -4,7 +4,7 @@ type RegisterRequest struct {
 	FullName string `json:"full_name"`
 	Email    string `json:"email"`
 	Password string `json:"password"`
-	Role     string `json:"role,omitempty"` // optional; backend can enforce by platform
+	Role     string `json:"role,omitempty"` 
 }
 
 type LoginRequest struct {

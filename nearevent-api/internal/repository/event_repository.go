@@ -47,6 +47,13 @@ type PendingEventRow struct {
 	CategoryName   *string
 }
 
+type EventWithMeta struct {
+	Event              models.Event
+	OrganizerName      string
+	OrganizerAvatarURL *string
+	CategoryName       *string
+}
+
 func NewEventRepository(db *pgxpool.Pool) *EventRepository {
 	return &EventRepository{db: db}
 }
@@ -490,3 +497,51 @@ func (r *EventRepository) GetAdminEventStats(ctx context.Context) (*AdminEventSt
 	return &stats, nil
 }
 
+func (r *EventRepository) GetPublishedByID(ctx context.Context, id uuid.UUID) (*EventWithMeta, error) {
+	query := `
+		SELECT
+			e.id, e.organizer_id, e.category_id, e.title, e.description, e.venue_name, e.address,
+			e.event_date, e.start_time, e.end_time, e.capacity, e.image_url, e.latitude, e.longitude,
+			e.status, e.rejection_reason, e.created_at, e.updated_at,
+			COALESCE(u.full_name, '') AS organizer_name,
+			u.avatar_url AS organizer_avatar_url,
+			c.name AS category_name
+		FROM events e
+		LEFT JOIN users u ON u.id = e.organizer_id
+		LEFT JOIN categories c ON c.id = e.category_id
+		WHERE e.id = $1
+		  AND e.status IN ('published', 'registration_closed')
+	`
+
+	var row EventWithMeta
+	err := r.db.QueryRow(ctx, query, id).Scan(
+		&row.Event.ID,
+		&row.Event.OrganizerID,
+		&row.Event.CategoryID,
+		&row.Event.Title,
+		&row.Event.Description,
+		&row.Event.VenueName,
+		&row.Event.Address,
+		&row.Event.EventDate,
+		&row.Event.StartTime,
+		&row.Event.EndTime,
+		&row.Event.Capacity,
+		&row.Event.ImageURL,
+		&row.Event.Latitude,
+		&row.Event.Longitude,
+		&row.Event.Status,
+		&row.Event.RejectionReason,
+		&row.Event.CreatedAt,
+		&row.Event.UpdatedAt,
+		&row.OrganizerName,
+		&row.OrganizerAvatarURL,
+		&row.CategoryName,
+	)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, ErrEventNotFound
+		}
+		return nil, err
+	}
+	return &row, nil
+}

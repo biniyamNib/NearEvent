@@ -16,6 +16,7 @@ import AdminCategoriesPage from "../features/admin/categories/AdminCategoriesPag
 import AdminUsersPage from "../features/admin/users/AdminUsersPage";
 import AdminUserDetailsPage from "../features/admin/users/AdminUserDetailsPage";
 import AdminSettingsPage from "../features/admin/settings/AdminSettingsPage";
+import ResetPasswordPage from "../features/auth/pages/ResetPasswordPage";
 
 export default function AppRouter() {
   return (
@@ -23,6 +24,7 @@ export default function AppRouter() {
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<SignupPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route element={<ProtectedRoute />}>
           <Route element={<RoleRoute allow={["organizer"]} />}>
             <Route element={<OrganizerLayout />}>

@@ -11,8 +11,8 @@ import StatusBadge from "../../../components/ui/StatusBadge";
 
 function formatEventDateTime(dateStr: string, timeStr: string) {
   try {
-    // Handle values like "02:44:00.000000" or "14:00"
-    const cleanTime = timeStr.slice(0, 5); // HH:MM
+
+    const cleanTime = timeStr.slice(0, 5);
     const date = new Date(`${dateStr}T${cleanTime}:00`);
 
     if (Number.isNaN(date.getTime())) return `${dateStr} · ${cleanTime}`;
@@ -40,10 +40,7 @@ export default function OrganizerDashboardPage() {
   useEffect(() => {
     const load = async () => {
       try {
-        const [dashboardData, eventsData] = await Promise.all([
-          getOrganizerDashboard(),
-          getOrganizerEvents(),
-        ]);
+        const [dashboardData, eventsData] = await Promise.all([getOrganizerDashboard(),getOrganizerEvents(),]);
         setStats(dashboardData);
         setEvents(eventsData);
       } catch (err: any) {

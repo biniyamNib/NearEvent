@@ -16,8 +16,7 @@ import { getPublishedEvents, type EventItem } from "../../api/events.api";
 import { getActiveCategories } from "../../api/categories.api";
 import { useAuthStore } from "../../store/authStore";
 
-const API_ORIGIN = "http://192.168.1.20:8080"; // use your PC LAN IP
-
+const API_ORIGIN = "http://10.200.9.61:8080";
 function formatEventDate(dateStr: string, timeStr?: string) {
   try {
     const d = new Date(`${dateStr}T00:00:00`);

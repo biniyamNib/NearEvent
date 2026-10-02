@@ -36,8 +36,9 @@ export default function CreateEventPage() {
   const [endTime, setEndTime] = useState("");
   const [venueName, setVenueName] = useState("");
   const [address, setAddress] = useState("");
+  const [latitude, setLatitude] = useState("");
+  const [longitude, setLongitude] = useState("");
   const [capacity, setCapacity] = useState("");
-  const [imageUrl, setImageUrl] = useState("");
 
   const [errors, setErrors] = useState<FormErrors>({});
   const [formError, setFormError] = useState("");
@@ -151,6 +152,8 @@ export default function CreateEventPage() {
         end_time: endTime,
         capacity: Number(capacity),
         image_url: imageUrl,
+        latitude: latitude.trim() === "" ? undefined : Number(latitude),
+        longitude: longitude.trim() === "" ? undefined : Number(longitude),
       });
 
       const elapsed = Date.now() - start;
@@ -159,7 +162,6 @@ export default function CreateEventPage() {
       }
 
       setSuccess("Event is submitted for review!");
-      // optional: navigate after short delay
       setTimeout(() => navigate("/organizer/dashboard"), 1200);
     } catch (err: any) {
       setFormError(err?.response?.data?.message || "Failed to create event");
@@ -339,6 +341,25 @@ export default function CreateEventPage() {
                 error={errors.address}
                 disabled={loading}
               />
+
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <Input
+                  label="Latitude (optional)"
+                  type="number"
+                  value={latitude}
+                  onChange={(e) => setLatitude(e.target.value)}
+                  placeholder="e.g. 9.0192"
+                  disabled={loading}
+                />
+                <Input
+                  label="Longitude (optional)"
+                  type="number"
+                  value={longitude}
+                  onChange={(e) => setLongitude(e.target.value)}
+                  placeholder="e.g. 38.7525"
+                  disabled={loading}
+                />
+              </div>
             </section>
 
             <section className="rounded-2xl border border-border-default bg-bg-default p-5 space-y-4">
@@ -367,7 +388,7 @@ export default function CreateEventPage() {
                   <div
                     onDragOver={(e) => e.preventDefault()}
                     onDrop={onBannerDrop}
-                    className="rounded-xl h-31 border border-dashed border-border-default bg-bg-subtle p-4 text-center"
+                    className="rounded-xl  border border-dashed border-border-default bg-bg-subtle p-4 text-center"
                   >
                     <input
                       id="banner-upload"

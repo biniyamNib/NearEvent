@@ -1,4 +1,4 @@
-import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import { LayoutDashboard, PlusCircle, Settings, LogOut } from "lucide-react";
 import Logo from "../components/ui/Logo";
 import Button from "../components/ui/Button";
@@ -71,7 +71,8 @@ export default function OrganizerLayout() {
               to="/organizer/events/create"
               label="Create Event"
               icon={<PlusCircle size={18} />}
-              active={location.pathname.startsWith("/organizer/events/create")}
+              // active={location.pathname.startsWith("/organizer/events/create")}
+              active={location.pathname === "/organizer/events/create"} // true
             />
             <SideNavItem
               to="/organizer/settings"

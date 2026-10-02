@@ -62,13 +62,13 @@ func (s *ReviewService) Create(ctx context.Context, userID, eventID string, req 
 	}
 
 	// Optional MVP rule: must be registered to review
-	status, err := s.regs.Get(ctx, uID, eID)
-	if err != nil || status != "registered" {
-		// if never registered or cancelled
-		if err != nil || status != "registered" {
-			return nil, errors.New("only registered attendees can review this event")
-		}
-	}
+	// status, err := s.regs.Get(ctx, uID, eID)
+	// if err != nil || status != "registered" {
+	// 	// if never registered or cancelled
+	// 	if err != nil || status != "registered" {
+	// 		return nil, errors.New("only registered attendees can review this event")
+	// 	}
+	// }
 
 	exists, err := s.reviews.Exists(ctx, uID, eID)
 	if err != nil {
