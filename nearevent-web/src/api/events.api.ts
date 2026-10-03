@@ -11,6 +11,8 @@ export type OrganizerDashboardStats = {
   pending_events: number;
   published_events: number;
   cancelled_events: number;
+  current_month_events: number;
+  previous_month_events: number;
   total_registrations: number;
 };
 
@@ -24,6 +26,7 @@ export type EventItem = {
   end_time: string;
   status: string;
   capacity: number;
+  registrations_count?: number;
 };
 
 export type CreateEventPayload = {

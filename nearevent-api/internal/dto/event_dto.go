@@ -50,6 +50,7 @@ type EventResponse struct {
 	Longitude       *float64 `json:"longitude,omitempty"`
 	Status          string   `json:"status"`
 	RejectionReason *string  `json:"rejection_reason,omitempty"`
+	RegistrationCount int    `json:"registrations_count"`
 	IsRegistered    bool     `json:"is_registered"`
     IsSaved         bool     `json:"is_saved"`
 	CreatedAt       string   `json:"created_at"`
@@ -65,11 +66,13 @@ type RegistrantResponse struct {
 }
 
 type OrganizerDashboardResponse struct {
-	TotalEvents        int `json:"total_events"`
-	PendingEvents      int `json:"pending_events"`
-	PublishedEvents    int `json:"published_events"`
-	CancelledEvents    int `json:"cancelled_events"`
-	TotalRegistrations int `json:"total_registrations"`
+	TotalEvents         int `json:"total_events"`
+	PendingEvents       int `json:"pending_events"`
+	PublishedEvents     int `json:"published_events"`
+	CancelledEvents     int `json:"cancelled_events"`
+	CurrentMonthEvents  int `json:"current_month_events"`
+	PreviousMonthEvents int `json:"previous_month_events"`
+	TotalRegistrations  int `json:"total_registrations"`
 }
 
 type AdminDashboardResponse struct {

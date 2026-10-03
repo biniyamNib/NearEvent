@@ -3,12 +3,12 @@ type StatusBadgeProps = {
 };
 
 const styles: Record<string, string> = {
-  published: "bg-[#D1FAE5] text-[#059669]",
-  pending: "bg-[#FEF3C7] text-[#D97706]",
-  draft: "bg-[#E2E8F0] text-[#64748B]",
-  cancelled: "bg-[#FFE4E6] text-[#E11D48]",
-  rejected: "bg-[#FFE4E6] text-[#E11D48]",
-  registration_closed: "bg-[#DBEAFE] text-[#2563EB]",
+  published: "bg-status-success-light text-status-success",
+  pending: "bg-status-warning-light text-status-warning",
+  draft: "bg-border-default text-text-tertiary",
+  cancelled: "bg-status-error-light text-status-error",
+  rejected: "bg-status-error-light text-status-error",
+  registration_closed: "bg-brand-primary-light text-brand-primary",
 };
 
 export default function StatusBadge({ status }: StatusBadgeProps) {

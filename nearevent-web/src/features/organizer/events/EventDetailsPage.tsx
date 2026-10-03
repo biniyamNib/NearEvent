@@ -1,5 +1,5 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   cancelEvent,
   closeEventRegistration,
@@ -11,6 +11,7 @@ import {
 import Button from "../../../components/ui/Button";
 import StatusBadge from "../../../components/ui/StatusBadge";
 import StatsCard from "../../../components/ui/StatsCard";
+import { formatDateLabel, formatTime } from "../../../utils/formatDate";
 
 type Registrant = {
   user_id: string;
@@ -19,32 +20,6 @@ type Registrant = {
   status: string;
   created_at: string;
 };
-
-function formatDateLabel(dateStr: string) {
-  try {
-    const date = new Date(`${dateStr}T00:00:00`);
-    return date.toLocaleDateString("en-US", {
-      weekday: "short",
-      day: "2-digit",
-      month: "short",
-    });
-  } catch {
-    return dateStr;
-  }
-}
-
-function formatTime(timeStr: string) {
-  const clean = timeStr?.slice(0, 5) || "";
-  const [h, m] = clean.split(":").map(Number);
-  if (Number.isNaN(h) || Number.isNaN(m)) return timeStr;
-  const date = new Date();
-  date.setHours(h, m, 0, 0);
-  return date.toLocaleTimeString("en-US", {
-    hour: "numeric",
-    minute: "2-digit",
-    hour12: true,
-  });
-}
 
 export default function EventDetailsPage() {
   const { id } = useParams();

@@ -8,27 +8,17 @@ import {
 } from "../../../api/events.api";
 import StatsCard from "../../../components/ui/StatsCard";
 import StatusBadge from "../../../components/ui/StatusBadge";
+import { formatEventDateTime } from "../../../utils/formatDate";
 
-function formatEventDateTime(dateStr: string, timeStr: string) {
-  try {
-
-    const cleanTime = timeStr.slice(0, 5);
-    const date = new Date(`${dateStr}T${cleanTime}:00`);
-
-    if (Number.isNaN(date.getTime())) return `${dateStr} · ${cleanTime}`;
-
-    return date.toLocaleString("en-US", {
-      weekday: "short",
-      day: "2-digit",
-      month: "short",
-      hour: "numeric",
-      minute: "2-digit",
-      hour12: true,
-    });
-    // Example: Sat, 24 Aug, 2:00 PM
-  } catch {
-    return `${dateStr} · ${timeStr}`;
+function getEventHint(current: number | null, previous: number | null): string | null {
+  if (current != null && previous != null) {
+    if (current > previous) {
+      return `+${current - previous} this month`;
+    } else if (current < previous) {
+      return `-${previous - current} this month`;
+    }
   }
+  return null;
 }
 
 export default function OrganizerDashboardPage() {
@@ -76,18 +66,22 @@ export default function OrganizerDashboardPage() {
         <StatsCard
           label="Total Events"
           value={stats?.total_events ?? 0}
+          hint={getEventHint(stats?.current_month_events ?? null, stats?.previous_month_events ?? null)}
         />
         <StatsCard
           label="Published Events"
           value={stats?.published_events ?? 0}
+          hint={getEventHint(stats?.current_month_events ?? null, stats?.previous_month_events ?? null)}
         />
         <StatsCard
           label="Total Registrations"
           value={stats?.total_registrations ?? 0}
+          hint={getEventHint(stats?.current_month_events ?? null, stats?.previous_month_events ?? null)}
         />
         <StatsCard
           label="Pending Events"
           value={stats?.pending_events ?? 0}
+          hint={getEventHint(stats?.current_month_events ?? null, stats?.previous_month_events ?? null)}
         />
       </div>
 
@@ -146,10 +140,7 @@ export default function OrganizerDashboardPage() {
                       </td>
 
                       <td className="px-5 py-4 text-text-secondary whitespace-nowrap">
-                        {/* Backend list doesn't include count yet */}
-                        {"registrations_count" in event
-                          ? `${(event as any).registrations_count} registered`
-                          : "0 registered"}
+                        {`${event.registrations_count ?? 0} registered`}
                       </td>
 
                       <td className="px-5 py-4">

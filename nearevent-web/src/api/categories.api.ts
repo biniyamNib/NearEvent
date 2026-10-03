@@ -9,13 +9,11 @@ export type Category = {
   created_at?: string;
 };
 
-// Public (for Create/Edit Event)
 export const getActiveCategories = async () => {
   const res = await api.get("/categories");
   return res.data.data as Category[];
 };
 
-// Admin
 export const getAdminCategories = async () => {
   const res = await api.get("/admin/categories");
   return res.data.data as Category[];
@@ -31,10 +29,7 @@ export const updateCategory = async (id: string, name: string) => {
   return res.data.data;
 };
 
-export const setCategoryStatus = async (
-  id: string,
-  status: "active" | "inactive"
-) => {
+export const setCategoryStatus = async (id: string, status: "active" | "inactive") => {
   const res = await api.patch(`/admin/categories/${id}/status`, { status });
   return res.data.data;
 };

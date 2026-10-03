@@ -28,11 +28,13 @@ type EventListFilter struct {
 }
 
 type OrganizerStats struct {
-	TotalEvents        int
-	PendingEvents      int
-	PublishedEvents    int
-	CancelledEvents    int
-	TotalRegistrations int
+	TotalEvents         int
+	PendingEvents       int
+	PublishedEvents     int
+	CancelledEvents     int
+	CurrentMonthEvents  int
+	PreviousMonthEvents int
+	TotalRegistrations  int
 }
 
 type AdminEventStats struct {
@@ -52,6 +54,11 @@ type EventWithMeta struct {
 	OrganizerName      string
 	OrganizerAvatarURL *string
 	CategoryName       *string
+}
+
+type OrganizerEventRow struct {
+	Event 			  models.Event
+	RegistrationsCount int
 }
 
 func NewEventRepository(db *pgxpool.Pool) *EventRepository {
@@ -135,14 +142,20 @@ func (r *EventRepository) GetByID(ctx context.Context, id uuid.UUID) (*models.Ev
 	return &event, nil
 }
 
-func (r *EventRepository) ListByOrganizer(ctx context.Context, organizerID uuid.UUID) ([]models.Event, error) {
+func (r *EventRepository) ListByOrganizer(ctx context.Context, organizerID uuid.UUID) ([]OrganizerEventRow, error) {
 	query := `
-		SELECT id, organizer_id, category_id, title, description, venue_name, address,
-		       event_date, start_time, end_time, capacity, image_url, latitude, longitude,
-		       status, rejection_reason, created_at, updated_at
-		FROM events
-		WHERE organizer_id = $1
-		ORDER BY created_at DESC
+		SELECT
+			e.id, e.organizer_id, e.category_id, e.title, e.description, e.venue_name, e.address,
+			e.event_date, e.start_time, e.end_time, e.capacity, e.image_url, e.latitude, e.longitude,
+			e.status, e.rejection_reason, e.created_at, e.updated_at,
+			COALESCE((
+				SELECT COUNT(*)
+				FROM event_registrations er
+				WHERE er.event_id = e.id AND er.status = 'registered'
+			), 0) AS registrations_count
+		FROM events e
+		WHERE e.organizer_id = $1
+		ORDER BY e.created_at DESC
 	`
 
 	rows, err := r.db.Query(ctx, query, organizerID)
@@ -151,35 +164,35 @@ func (r *EventRepository) ListByOrganizer(ctx context.Context, organizerID uuid.
 	}
 	defer rows.Close()
 
-	events := make([]models.Event, 0)
+	items := make([]OrganizerEventRow, 0)
 	for rows.Next() {
-		var event models.Event
+		var row OrganizerEventRow
 		if err := rows.Scan(
-			&event.ID,
-			&event.OrganizerID,
-			&event.CategoryID,
-			&event.Title,
-			&event.Description,
-			&event.VenueName,
-			&event.Address,
-			&event.EventDate,
-			&event.StartTime,
-			&event.EndTime,
-			&event.Capacity,
-			&event.ImageURL,
-			&event.Latitude,
-			&event.Longitude,
-			&event.Status,
-			&event.RejectionReason,
-			&event.CreatedAt,
-			&event.UpdatedAt,
+			&row.Event.ID,
+			&row.Event.OrganizerID,
+			&row.Event.CategoryID,
+			&row.Event.Title,
+			&row.Event.Description,
+			&row.Event.VenueName,
+			&row.Event.Address,
+			&row.Event.EventDate,
+			&row.Event.StartTime,
+			&row.Event.EndTime,
+			&row.Event.Capacity,
+			&row.Event.ImageURL,
+			&row.Event.Latitude,
+			&row.Event.Longitude,
+			&row.Event.Status,
+			&row.Event.RejectionReason,
+			&row.Event.CreatedAt,
+			&row.Event.UpdatedAt,
+			&row.RegistrationsCount,
 		); err != nil {
 			return nil, err
 		}
-		events = append(events, event)
+		items = append(items, row)
 	}
-
-	return events, rows.Err()
+	return items, rows.Err()
 }
 
 func (r *EventRepository) Update(ctx context.Context, event *models.Event) error {
@@ -448,7 +461,15 @@ func (r *EventRepository) GetOrganizerStats(ctx context.Context, organizerID uui
 			COUNT(*) AS total_events,
 			COUNT(*) FILTER (WHERE status = 'pending') AS pending_events,
 			COUNT(*) FILTER (WHERE status IN ('published', 'registration_closed')) AS published_events,
-			COUNT(*) FILTER (WHERE status = 'cancelled') AS cancelled_events
+			COUNT(*) FILTER (WHERE status = 'cancelled') AS cancelled_events,
+			COUNT(*) FILTER (
+					WHERE created_at >= DATE_TRUNC('month', CURRENT_DATE) 
+					  AND created_at < DATE_TRUNC('month', CURRENT_DATE) + INTERVAL '1 month' 
+					) AS current_month_events,
+			COUNT(*) FILTER (
+					WHERE created_at >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '1 month' 
+					  AND created_at > DATE_TRUNC('month', CURRENT_DATE) 
+					) AS previous_month_events
 		FROM events
 		WHERE organizer_id = $1
 	`
@@ -459,6 +480,8 @@ func (r *EventRepository) GetOrganizerStats(ctx context.Context, organizerID uui
 		&stats.PendingEvents,
 		&stats.PublishedEvents,
 		&stats.CancelledEvents,
+		&stats.CurrentMonthEvents,
+		&stats.PreviousMonthEvents,
 	)
 	if err != nil {
 		return nil, err
@@ -505,7 +528,7 @@ func (r *EventRepository) GetPublishedByID(ctx context.Context, id uuid.UUID) (*
 			e.status, e.rejection_reason, e.created_at, e.updated_at,
 			COALESCE(u.full_name, '') AS organizer_name,
 			u.avatar_url AS organizer_avatar_url,
-			c.name AS category_name
+        	c.name AS category_name
 		FROM events e
 		LEFT JOIN users u ON u.id = e.organizer_id
 		LEFT JOIN categories c ON c.id = e.category_id

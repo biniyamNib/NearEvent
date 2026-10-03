@@ -127,14 +127,16 @@ func (s *EventService) ListMine(ctx context.Context, organizerID string) ([]dto.
 		return nil, errors.New("invalid organizer id")
 	}
 
-	events, err := s.events.ListByOrganizer(ctx, orgID)
+	rows, err := s.events.ListByOrganizer(ctx, orgID)
 	if err != nil {
 		return nil, err
 	}
 
-	result := make([]dto.EventResponse, 0, len(events))
-	for _, e := range events {
-		result = append(result, mapEventResponse(&e))
+	result := make([]dto.EventResponse, 0, len(rows))
+	for _, row := range rows {
+		resp := mapEventResponse(&row.Event)
+		resp.RegistrationCount = row.RegistrationsCount
+		result = append(result, resp)
 	}
 	return result, nil
 }
@@ -586,10 +588,12 @@ func (s *EventService) OrganizerDashboard(ctx context.Context, organizerID strin
 	}
 
 	return &dto.OrganizerDashboardResponse{
-		TotalEvents:        stats.TotalEvents,
-		PendingEvents:      stats.PendingEvents,
-		PublishedEvents:    stats.PublishedEvents,
-		CancelledEvents:    stats.CancelledEvents,
-		TotalRegistrations: stats.TotalRegistrations,
+		TotalEvents:         stats.TotalEvents,
+		PendingEvents:       stats.PendingEvents,
+		PublishedEvents:     stats.PublishedEvents,
+		CancelledEvents:     stats.CancelledEvents,
+		CurrentMonthEvents:  stats.CurrentMonthEvents,
+		PreviousMonthEvents: stats.PreviousMonthEvents,
+		TotalRegistrations:  stats.TotalRegistrations,
 	}, nil
 }

@@ -1,7 +1,7 @@
 type Props = {
   label: string;
   value: string | number;
-  hint?: string;
+  hint?: string | null;
 };
 
 export default function StatsCard({ label, value, hint }: Props) {
