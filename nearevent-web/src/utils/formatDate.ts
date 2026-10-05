@@ -1,6 +1,5 @@
 export function formatEventDateTime(date: string, time: string) {
-  // date: YYYY-MM-DD, time: HH:MM or HH:MM:SS...
-  const cleanTime = time.slice(0, 5); // HH:MM
+  const cleanTime = time.slice(0, 5);
   const value = new Date(`${date}T${cleanTime}:00`);
 
   if (Number.isNaN(value.getTime())) {

@@ -14,9 +14,10 @@ const (
 )
 
 type Category struct {
-	ID        uuid.UUID      `json:"id"`
-	Name      string         `json:"name"`
-	Status    CategoryStatus `json:"status"`
-	CreatedAt time.Time      `json:"created_at"`
-	UpdatedAt time.Time      `json:"updated_at"`
+	ID          uuid.UUID      `json:"id"`
+	Name        string         `json:"name"`
+	Status      CategoryStatus `json:"status"`	
+	EventsCount int            `json:"events_count"`
+	CreatedAt   time.Time      `json:"created_at"`
+	UpdatedAt   time.Time      `json:"updated_at"`
 }

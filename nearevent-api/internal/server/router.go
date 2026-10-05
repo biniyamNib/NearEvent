@@ -48,7 +48,6 @@ func NewRouter(deps Dependencies) http.Handler {
 		})
 	})
 
-	// Serve local uploaded images
 	r.Handle("/uploads/*", http.StripPrefix("/uploads/", http.FileServer(http.Dir("uploads"))))
 
 	r.Route("/api/v1", func(api chi.Router) {

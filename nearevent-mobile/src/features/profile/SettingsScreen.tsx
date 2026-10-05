@@ -60,13 +60,6 @@ export default function SettingsScreen({ navigation }: Props) {
       return;
     }
 
-    // const result = await ImagePicker.launchImageLibraryAsync({
-    //   mediaTypes: ImagePicker.MediaTypeOptions.Images,
-    //   allowsEditing: true,
-    //   aspect: [1, 1],
-    //   quality: 0.8,
-    // });
-
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ["images"],
       allowsEditing: true,
@@ -117,16 +110,23 @@ export default function SettingsScreen({ navigation }: Props) {
 
       if (avatarFile) {
         const form = new FormData();
-        form.append("image", {
+        form.append("file", {
           uri: avatarFile.uri,
-          name: avatarFile.name,
-          type: avatarFile.type,
+          name: avatarFile.name || "avatar.jpg",
+          type: avatarFile.type || "image/jpeg",
         } as any);
 
         const uploadRes = await api.post("/uploads/image", form, {
-          headers: { "Content-Type": "multipart/form-data" },
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "multipart/form-data",
+          },
+          transformRequest: (data) => data, 
         });
-        avatar_url = uploadRes.data?.data?.url || uploadRes.data?.data;
+       avatar_url =
+        uploadRes.data?.data?.url ||
+        uploadRes.data?.data ||
+        uploadRes.data?.url;
       }
 
       const payload: any = {

@@ -123,6 +123,7 @@ func mapCategoryResponse(c *models.Category) dto.CategoryResponse {
 		ID:        c.ID.String(),
 		Name:      c.Name,
 		Status:    string(c.Status),
+		EventsCount: c.EventsCount,
 		CreatedAt: c.CreatedAt.Format(time.RFC3339),
 		UpdatedAt: c.UpdatedAt.Format(time.RFC3339),
 	}

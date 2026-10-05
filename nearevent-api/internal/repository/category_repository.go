@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"time"
+	"fmt"
 
 	"nearevent-api/internal/models"
 
@@ -66,9 +67,19 @@ func (r *CategoryRepository) GetByID(ctx context.Context, id uuid.UUID) (*models
 
 func (r *CategoryRepository) ListAll(ctx context.Context) ([]models.Category, error) {
 	query := `
-		SELECT id, name, status, created_at, updated_at
-		FROM categories
-		ORDER BY name ASC
+		SELECT
+			c.id,
+			c.name,
+			c.status,
+			c.created_at,
+			c.updated_at,
+			COALESCE((
+				SELECT COUNT(*)::int
+				FROM events e
+				WHERE e.category_id = c.id
+			), 0) AS events_count
+		FROM categories c
+		ORDER BY c.name ASC
 	`
 	rows, err := r.db.Query(ctx, query)
 	if err != nil {
@@ -79,7 +90,14 @@ func (r *CategoryRepository) ListAll(ctx context.Context) ([]models.Category, er
 	items := make([]models.Category, 0)
 	for rows.Next() {
 		var c models.Category
-		if err := rows.Scan(&c.ID, &c.Name, &c.Status, &c.CreatedAt, &c.UpdatedAt); err != nil {
+		if err := rows.Scan(
+			&c.ID,
+			&c.Name,
+			&c.Status,
+			&c.CreatedAt,
+			&c.UpdatedAt,
+			&c.EventsCount,
+		); err != nil {
 			return nil, err
 		}
 		items = append(items, c)
@@ -89,10 +107,20 @@ func (r *CategoryRepository) ListAll(ctx context.Context) ([]models.Category, er
 
 func (r *CategoryRepository) ListActive(ctx context.Context) ([]models.Category, error) {
 	query := `
-		SELECT id, name, status, created_at, updated_at
-		FROM categories
-		WHERE status = 'active'
-		ORDER BY name ASC
+		SELECT 
+			c.id, 
+			c.name, 
+			c.status, 
+			c.created_at, 
+			c.updated_at,
+			COALESCE((
+				SELECT COUNT(*)
+				FROM events e
+				WHERE e.category_id = c.id
+			), 0) AS events_count
+		FROM categories c
+		WHERE c.status = 'active'
+		ORDER BY c.name ASC;
 	`
 	rows, err := r.db.Query(ctx, query)
 	if err != nil {
@@ -103,9 +131,16 @@ func (r *CategoryRepository) ListActive(ctx context.Context) ([]models.Category,
 	items := make([]models.Category, 0)
 	for rows.Next() {
 		var c models.Category
-		if err := rows.Scan(&c.ID, &c.Name, &c.Status, &c.CreatedAt, &c.UpdatedAt); err != nil {
+		if err := rows.Scan(
+			&c.ID, 
+			&c.Name, 
+			&c.Status, 
+			&c.CreatedAt, 
+			&c.UpdatedAt,
+			&c.EventsCount); err != nil {
 			return nil, err
 		}
+		fmt.Println("SCAN", c.Name, c.ID, c.EventsCount)
 		items = append(items, c)
 	}
 	return items, rows.Err()
