@@ -27,6 +27,11 @@ type EventRegistrant struct {
 	CreatedAt time.Time
 }
 
+type RegistrantEmail struct {
+	UserID uuid.UUID
+	Email  string
+}
+
 func NewRegistrationRepository(db *pgxpool.Pool) *RegistrationRepository {
 	return &RegistrationRepository{db: db}
 }
@@ -158,4 +163,75 @@ func (r *RegistrationRepository) ListUserIDsByEvent(ctx context.Context, eventID
 		ids = append(ids, id)
 	}
 	return ids, rows.Err()
+}
+
+func (r *RegistrationRepository) ListRegisteredForReminder(
+	ctx context.Context,
+	eventID uuid.UUID,
+	kind string,
+) ([]RegistrantEmail, error) {
+	var flagCol string
+	switch kind {
+	case "24h":
+		flagCol = "reminder_24h_sent_at"
+	case "1h":
+		flagCol = "reminder_1h_sent_at"
+	case "review":
+		flagCol = "review_prompt_sent_at"
+	default:
+		return nil, errors.New("invalid reminder kind")
+	}
+
+	// column name is controlled by switch only — not user input
+	query := `
+		SELECT er.user_id, u.email
+		FROM event_registrations er
+		INNER JOIN users u ON u.id = er.user_id
+		WHERE er.event_id = $1
+		  AND er.status = 'registered'
+		  AND er.` + flagCol + ` IS NULL
+	`
+
+	rows, err := r.db.Query(ctx, query, eventID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	items := make([]RegistrantEmail, 0)
+	for rows.Next() {
+		var item RegistrantEmail
+		if err := rows.Scan(&item.UserID, &item.Email); err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+	return items, rows.Err()
+}
+
+func (r *RegistrationRepository) MarkReminder24hSent(ctx context.Context, eventID, userID uuid.UUID) error {
+	_, err := r.db.Exec(ctx, `
+		UPDATE event_registrations
+		SET reminder_24h_sent_at = $1
+		WHERE event_id = $2 AND user_id = $3 AND status = 'registered'
+	`, time.Now().UTC(), eventID, userID)
+	return err
+}
+
+func (r *RegistrationRepository) MarkReminder1hSent(ctx context.Context, eventID, userID uuid.UUID) error {
+	_, err := r.db.Exec(ctx, `
+		UPDATE event_registrations
+		SET reminder_1h_sent_at = $1
+		WHERE event_id = $2 AND user_id = $3 AND status = 'registered'
+	`, time.Now().UTC(), eventID, userID)
+	return err
+}
+
+func (r *RegistrationRepository) MarkReviewPromptSent(ctx context.Context, eventID, userID uuid.UUID) error {
+	_, err := r.db.Exec(ctx, `
+		UPDATE event_registrations
+		SET review_prompt_sent_at = $1
+		WHERE event_id = $2 AND user_id = $3 AND status = 'registered'
+	`, time.Now().UTC(), eventID, userID)
+	return err
 }

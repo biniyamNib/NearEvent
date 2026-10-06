@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"time"
 	"net/http"
 
 	"nearevent-api/internal/auth"
@@ -76,6 +77,20 @@ func main() {
 	adminDashboardHandler := handler.NewAdminDashboardHandler(adminDashboardService)
 	uploadHandler := handler.NewUploadHandler(uploadService)
     wsHandler := handler.NewNotificationWSHandler(hub, tokenManager)
+	reminderService := service.NewReminderService(eventRepo, regRepo, notificationService)
+
+	go func() {
+		time.Sleep(5 * time.Second)
+		_ = reminderService.Run(context.Background())
+
+		ticker := time.NewTicker(15 * time.Minute)
+		defer ticker.Stop()
+		for range ticker.C {
+			if err := reminderService.Run(context.Background()); err != nil {
+				log.Println("reminder run:", err)
+			}
+		}
+	}()
 
 	router := server.NewRouter(server.Dependencies{
 		AuthHandler:         authHandler,

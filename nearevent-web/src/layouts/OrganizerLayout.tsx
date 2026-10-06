@@ -4,6 +4,7 @@ import { LayoutDashboard, PlusCircle, Settings, LogOut } from "lucide-react";
 import Logo from "../components/ui/Logo";
 import Button from "../components/ui/Button";
 import SideNavItem from "../components/ui/SideNavItem";
+import NotificationDropdown from "../components/ui/NotificationDropdown";
 import { useAuthStore } from "../store/authStore";
 
 export default function OrganizerLayout() {
@@ -35,6 +36,7 @@ export default function OrganizerLayout() {
         <Logo className="text-xl" />
 
         <div className="flex items-center gap-3">
+          <NotificationDropdown />
           <Button onClick={() => navigate("/organizer/events/create")}>
             Create Event
           </Button>

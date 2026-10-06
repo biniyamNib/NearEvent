@@ -568,3 +568,52 @@ func (r *EventRepository) GetPublishedByID(ctx context.Context, id uuid.UUID) (*
 	}
 	return &row, nil
 }
+
+func (r *EventRepository) ListForReminderScan(ctx context.Context) ([]models.Event, error) {
+	// Narrow scan: from yesterday through +3 days
+	query := `
+		SELECT id, organizer_id, category_id, title, description, venue_name, address,
+		       event_date, start_time, end_time, capacity, image_url, latitude, longitude,
+		       status, rejection_reason, created_at, updated_at
+		FROM events
+		WHERE status IN ('published', 'registration_closed')
+		  AND event_date >= CURRENT_DATE - INTERVAL '1 day'
+		  AND event_date <= CURRENT_DATE + INTERVAL '3 days'
+		ORDER BY event_date ASC, start_time ASC
+	`
+
+	rows, err := r.db.Query(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	events := make([]models.Event, 0)
+	for rows.Next() {
+		var event models.Event
+		if err := rows.Scan(
+			&event.ID,
+			&event.OrganizerID,
+			&event.CategoryID,
+			&event.Title,
+			&event.Description,
+			&event.VenueName,
+			&event.Address,
+			&event.EventDate,
+			&event.StartTime,
+			&event.EndTime,
+			&event.Capacity,
+			&event.ImageURL,
+			&event.Latitude,
+			&event.Longitude,
+			&event.Status,
+			&event.RejectionReason,
+			&event.CreatedAt,
+			&event.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		events = append(events, event)
+	}
+	return events, rows.Err()
+}
