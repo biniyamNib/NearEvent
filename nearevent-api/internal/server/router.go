@@ -25,6 +25,7 @@ type Dependencies struct {
 	AdminDashboardHandler *handler.AdminDashboardHandler
 	UploadHandler *handler.UploadHandler
 	TokenManager *auth.TokenManager
+	NotificationWSHandler *handler.NotificationWSHandler
 }
 
 func NewRouter(deps Dependencies) http.Handler {
@@ -84,6 +85,7 @@ func NewRouter(deps Dependencies) http.Handler {
         })
 
 		api.Get("/categories", deps.CategoryHandler.ListActive)
+		api.Get("/notifications/ws", deps.NotificationWSHandler.Stream)
 
 		api.Route("/admin", func(admin chi.Router) {
 			admin.Use(middleware.AuthRequired(deps.TokenManager))

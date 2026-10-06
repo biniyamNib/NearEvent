@@ -7,16 +7,52 @@ import (
 
 	"nearevent-api/internal/dto"
 	"nearevent-api/internal/repository"
+	"nearevent-api/internal/realtime"
 
 	"github.com/google/uuid"
 )
 
 type NotificationService struct {
 	notifications *repository.NotificationRepository
+	hub           *realtime.Hub
 }
 
-func NewNotificationService(notifications *repository.NotificationRepository) *NotificationService {
-	return &NotificationService{notifications: notifications}
+func NewNotificationService(
+	notifications *repository.NotificationRepository,
+	hub *realtime.Hub,
+) *NotificationService {
+	return &NotificationService{notifications: notifications, hub: hub}
+}
+
+func (s *NotificationService) Create(
+	ctx context.Context,
+	userID uuid.UUID,
+	notifType, title, message string,
+	eventID *uuid.UUID,
+) error {
+	n := repository.NewNotification(userID, notifType, title, message, eventID)
+	if err := s.notifications.Create(ctx, n); err != nil {
+		return err
+	}
+
+	var eventIDStr *string
+	if eventID != nil {
+		v := eventID.String()
+		eventIDStr = &v
+	}
+
+	if s.hub != nil {
+		s.hub.SendToUser(userID, map[string]any{
+			"id":         n.ID.String(),
+			"type":       notifType,
+			"title":      title,
+			"message":    message,
+			"event_id":   eventIDStr,
+			"is_read":    false,
+			"created_at": n.CreatedAt.Format(time.RFC3339),
+		})
+	}
+	return nil
 }
 
 func (s *NotificationService) ListMine(ctx context.Context, userID string) ([]dto.NotificationResponse, error) {
@@ -70,15 +106,4 @@ func (s *NotificationService) MarkAllRead(ctx context.Context, userID string) er
 		return errors.New("invalid user id")
 	}
 	return s.notifications.MarkAllRead(ctx, uID)
-}
-
-// Helper for other modules to create notifications
-func (s *NotificationService) Create(
-	ctx context.Context,
-	userID uuid.UUID,
-	notifType, title, message string,
-	eventID *uuid.UUID,
-) error {
-	n := repository.NewNotification(userID, notifType, title, message, eventID)
-	return s.notifications.Create(ctx, n)
 }

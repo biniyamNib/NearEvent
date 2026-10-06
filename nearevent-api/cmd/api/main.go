@@ -13,6 +13,7 @@ import (
 	"nearevent-api/internal/repository"
 	"nearevent-api/internal/server"
 	"nearevent-api/internal/service"
+	"nearevent-api/internal/realtime"	
 )
 
 func main() {
@@ -26,6 +27,8 @@ func main() {
 		log.Fatalf("failed to connect database: %v", err)
 	}
 	defer db.Close()
+
+	hub := realtime.NewHub()
 
 	tokenManager := auth.NewTokenManager(cfg.JWTSecret, cfg.JWTExpiresInHours)
 
@@ -49,7 +52,7 @@ func main() {
 	log.Printf("admin user ready: %s", cfg.AdminEmail)
 
 	// Services
-	notificationService := service.NewNotificationService(notificationRepo)
+	notificationService := service.NewNotificationService(notificationRepo, hub)
 	authService := service.NewAuthService(userRepo, tokenManager)
 	eventService := service.NewEventService(eventRepo, regRepo, savedRepo, notificationService)
 	savedService := service.NewSavedEventService(savedRepo, eventRepo)
@@ -59,7 +62,6 @@ func main() {
 	adminUserService := service.NewAdminUserService(userRepo)
 	adminDashboardService := service.NewAdminDashboardService(eventRepo, userRepo)
 	uploadService := service.NewUploadService("uploads")
-	uploadHandler := handler.NewUploadHandler(uploadService)
 
 	// Handlers
 	authHandler := handler.NewAuthHandler(authService)
@@ -71,6 +73,8 @@ func main() {
 	notificationHandler := handler.NewNotificationHandler(notificationService)
 	adminUserHandler := handler.NewAdminUserHandler(adminUserService)
 	adminDashboardHandler := handler.NewAdminDashboardHandler(adminDashboardService)
+	uploadHandler := handler.NewUploadHandler(uploadService)
+    wsHandler := handler.NewNotificationWSHandler(hub, tokenManager)
 
 	router := server.NewRouter(server.Dependencies{
 		AuthHandler:         authHandler,
@@ -83,7 +87,8 @@ func main() {
 		AdminUserHandler:    adminUserHandler,
 		AdminDashboardHandler: adminDashboardHandler,
 		UploadHandler: uploadHandler,
-		TokenManager:        tokenManager,
+		TokenManager:  tokenManager,
+		NotificationWSHandler: wsHandler,
 	})
 
 	addr := fmt.Sprintf(":%s", cfg.AppPort)

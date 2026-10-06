@@ -205,22 +205,6 @@ export default function AdminDashboardPage() {
                           >
                             Review
                           </Link>
-
-                          <button
-                            className="text-status-success hover:underline disabled:opacity-50"
-                            disabled={actionLoadingId === event.id}
-                            onClick={() => onApprove(event.id)}
-                          >
-                            Approve
-                          </button>
-
-                          <button
-                            className="text-status-error hover:underline disabled:opacity-50"
-                            disabled={actionLoadingId === event.id}
-                            onClick={() => onReject(event.id)}
-                          >
-                            Reject
-                          </button>
                         </div>
                       </td>
                     </tr>

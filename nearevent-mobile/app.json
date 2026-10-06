@@ -13,6 +13,12 @@
       "supportsTablet": true
     },
     "android": {
+      "googleServiceFile": "./google-services.json",
+      "ios": {
+        "infoPlist": {
+          "UIBackgroundModes": ["remote-notification"]
+        }
+      },
       "adaptiveIcon": {
         "backgroundColor": "#2563EB",
         "foregroundImage": "./assets/android-icon-foreground.png",
@@ -27,7 +33,14 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+      "expo-notifications",
+      {
+        "icon": "./assets/notification-icon.png",
+        "color": "#2563EB"
+      }
+      ]
     ]
   }
 }
