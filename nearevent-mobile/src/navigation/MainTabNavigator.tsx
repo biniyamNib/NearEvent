@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
 import SearchScreen from "../features/discovery/SearchScreen";
@@ -5,6 +6,8 @@ import MyEventsScreen from "../features/myEvents/MyEventsScreen";
 import HomeStack from "./HomeStack";
 import ProfileStack from "./ProfileStack";
 import { colors } from "../theme/colors";
+import { registerForPushAsync } from "../notifications/registerForPush";
+import { registerDeviceToken } from "../api/notifications.api";
 
 export type MainTabParamList = {
   Home: undefined;
@@ -16,6 +19,18 @@ export type MainTabParamList = {
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
 export default function MainTabNavigator() {
+  useEffect(() => {
+  registerForPushAsync().then(async (token) => {
+    if (!token) return;
+    try {
+      await registerDeviceToken(token);
+      console.log("Push token registered with API");
+    } catch (e) {
+      console.log("Failed to register push token", e);
+    }
+  });
+}, []);
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({

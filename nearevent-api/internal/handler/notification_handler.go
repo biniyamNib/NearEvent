@@ -1,9 +1,11 @@
 package handler
 
 import (
+	"encoding/json"
 	"errors"
 	"net/http"
 
+	"nearevent-api/internal/dto"
 	"nearevent-api/internal/middleware"
 	"nearevent-api/internal/repository"
 	"nearevent-api/internal/service"
@@ -57,4 +59,21 @@ func (h *NotificationHandler) MarkAllRead(w http.ResponseWriter, r *http.Request
 	}
 
 	utils.Success(w, http.StatusOK, "All notifications marked as read", nil)
+}
+
+func (h *NotificationHandler) RegisterDeviceToken(w http.ResponseWriter, r *http.Request) {
+	userID := middleware.GetUserID(r.Context())
+
+	var req dto.RegisterDeviceTokenRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		utils.Error(w, http.StatusBadRequest, "Invalid request body", nil)
+		return
+	}
+
+	if err := h.service.RegisterDeviceToken(r.Context(), userID, req.Token, req.Platform); err != nil {
+		utils.Error(w, http.StatusBadRequest, err.Error(), nil)
+		return
+	}
+
+	utils.Success(w, http.StatusOK, "Device token registered", nil)
 }

@@ -157,6 +157,7 @@ func NewRouter(deps Dependencies) http.Handler {
 		api.Group(func(private chi.Router) {
 			private.Use(middleware.AuthRequired(deps.TokenManager))
 			private.Put("/users/me", deps.AuthHandler.UpdateProfile)
+			private.Post("/users/me/device-token", deps.NotificationHandler.RegisterDeviceToken)
 		})
 
 	})

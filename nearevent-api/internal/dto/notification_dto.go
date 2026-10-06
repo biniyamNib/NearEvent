@@ -1,5 +1,11 @@
 package dto
 
+// dto
+type RegisterDeviceTokenRequest struct {
+	Token    string `json:"token"`
+	Platform string `json:"platform"`
+}
+
 type NotificationResponse struct {
 	ID        string  `json:"id"`
 	Type      string  `json:"type"`

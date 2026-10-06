@@ -4,24 +4,32 @@ import (
 	"context"
 	"errors"
 	"time"
+	"strings"
 
 	"nearevent-api/internal/dto"
 	"nearevent-api/internal/repository"
 	"nearevent-api/internal/realtime"
+	"nearevent-api/internal/push"
 
 	"github.com/google/uuid"
 )
 
 type NotificationService struct {
 	notifications *repository.NotificationRepository
+	deviceTokens  *repository.DeviceTokenRepository
 	hub           *realtime.Hub
 }
 
 func NewNotificationService(
 	notifications *repository.NotificationRepository,
+	deviceTokens *repository.DeviceTokenRepository,
 	hub *realtime.Hub,
 ) *NotificationService {
-	return &NotificationService{notifications: notifications, hub: hub}
+	return &NotificationService{
+		notifications: notifications, 
+		deviceTokens: deviceTokens,
+		hub: hub,
+	}
 }
 
 func (s *NotificationService) Create(
@@ -41,17 +49,28 @@ func (s *NotificationService) Create(
 		eventIDStr = &v
 	}
 
-	if s.hub != nil {
-		s.hub.SendToUser(userID, map[string]any{
-			"id":         n.ID.String(),
-			"type":       notifType,
-			"title":      title,
-			"message":    message,
-			"event_id":   eventIDStr,
-			"is_read":    false,
-			"created_at": n.CreatedAt.Format(time.RFC3339),
-		})
+	payload := map[string]any{
+		"id":         n.ID.String(),
+		"type":       notifType,
+		"title":      title,
+		"message":    message,
+		"event_id":   eventIDStr,
+		"is_read":    false,
+		"created_at": n.CreatedAt.Format(time.RFC3339),
 	}
+
+
+	if s.hub != nil {
+		s.hub.SendToUser(userID, payload)
+	}
+
+	if s.deviceTokens != nil {
+		tokens, err := s.deviceTokens.ListByUser(ctx, userID)
+		if err == nil && len(tokens) > 0 {
+			push.SendExpo(tokens, title, message, payload)
+		}
+	}
+
 	return nil
 }
 
@@ -106,4 +125,24 @@ func (s *NotificationService) MarkAllRead(ctx context.Context, userID string) er
 		return errors.New("invalid user id")
 	}
 	return s.notifications.MarkAllRead(ctx, uID)
+}
+
+func (s *NotificationService) RegisterDeviceToken(
+	ctx context.Context,
+	userID string,
+	token string,
+	platform string,
+) error {
+	uID, err := uuid.Parse(userID)
+	if err != nil {
+		return errors.New("invalid user id")
+	}
+	token = strings.TrimSpace(token)
+	if token == "" {
+		return errors.New("token is required")
+	}
+	if strings.TrimSpace(platform) == "" {
+		platform = "unknown"
+	}
+	return s.deviceTokens.Upsert(ctx, uID, token, platform)
 }

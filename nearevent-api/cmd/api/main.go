@@ -28,6 +28,7 @@ func main() {
 	}
 	defer db.Close()
 
+	deviceTokenRepo := repository.NewDeviceTokenRepository(db)
 	hub := realtime.NewHub()
 
 	tokenManager := auth.NewTokenManager(cfg.JWTSecret, cfg.JWTExpiresInHours)
@@ -52,7 +53,7 @@ func main() {
 	log.Printf("admin user ready: %s", cfg.AdminEmail)
 
 	// Services
-	notificationService := service.NewNotificationService(notificationRepo, hub)
+	notificationService := service.NewNotificationService(notificationRepo, deviceTokenRepo, hub)
 	authService := service.NewAuthService(userRepo, tokenManager)
 	eventService := service.NewEventService(eventRepo, regRepo, savedRepo, notificationService)
 	savedService := service.NewSavedEventService(savedRepo, eventRepo)

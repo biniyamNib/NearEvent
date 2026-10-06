@@ -1,5 +1,6 @@
 // src/api/notifications.api.ts
 import { api } from "./client";
+import { Platform } from "react-native";
 
 export type NotificationItem = {
   id: string;
@@ -24,4 +25,11 @@ export const markNotificationRead = async (id: string) => {
 export const markAllNotificationsRead = async () => {
   const res = await api.patch("/notifications/read-all");
   return res.data.data;
+};
+
+export const registerDeviceToken = async (token: string) => {
+  await api.post("/users/me/device-token", {
+    token,
+    platform: Platform.OS,
+  });
 };

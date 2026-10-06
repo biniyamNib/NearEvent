@@ -15,8 +15,14 @@
     "android": {
       "googleServiceFile": "./google-services.json",
       "ios": {
+        "bundleIdentifier": "com.nearevent.app",
         "infoPlist": {
           "UIBackgroundModes": ["remote-notification"]
+        }
+      },
+      "extra": {
+        "eas": {
+          "projectId": "1f2a1d3b-5002-443d-b3bc-9fcbd4bfcf93"
         }
       },
       "adaptiveIcon": {
@@ -27,7 +33,7 @@
       },
       "usesCleartextTraffic": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.anonymous.neareventmobile"
+      "package": "com.nearevent.app"
     },
     "web": {
       "favicon": "./assets/favicon.png"
