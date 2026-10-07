@@ -37,9 +37,11 @@ export default function OrganizerLayout() {
 
         <div className="flex items-center gap-3">
           <NotificationDropdown />
-          <Button onClick={() => navigate("/organizer/events/create")}>
-            Create Event
-          </Button>
+          <div className="hidden md:block">
+            <Button onClick={() => navigate("/organizer/events/create")}>
+              Create Event
+            </Button>
+          </div>
           <div className="h-9 w-9 overflow-hidden rounded-full bg-brand-primary-light text-brand-primary flex items-center justify-center text-sm font-semibold">
             {avatarSrc ? (
               <img
@@ -55,7 +57,7 @@ export default function OrganizerLayout() {
       </header>
 
       <div className="flex flex-1 min-h-0">
-        <aside className="w-64 shrink-0 overflow-y-auto border-r border-border-default bg-bg-default px-4 py-5 flex flex-col">
+        <aside className="flex w-[72px] shrink-0 flex-col overflow-y-auto border-r border-border-default bg-bg-default px-2 py-5 md:w-64 md:px-4">
           <nav className="space-y-1">
             <SideNavItem
               to="/organizer/dashboard"
@@ -83,7 +85,7 @@ export default function OrganizerLayout() {
             className="mt-auto flex items-center gap-2 px-3 py-2.5 text-sm text-status-error hover:opacity-80"
           >
             <LogOut size={18} />
-            Log Out
+            <span className="hidden md:inline">Log Out</span>
           </button>
         </aside>
 

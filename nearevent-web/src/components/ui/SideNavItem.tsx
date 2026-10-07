@@ -16,7 +16,7 @@ export default function SideNavItem({
   active = false,
   disabled = false,
 }: Props) {
-  if (disabled) {
+  if (disabled) { 
     return (
       <div className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-text-disabled cursor-not-allowed">
         {icon}
@@ -35,7 +35,7 @@ export default function SideNavItem({
       }`}
     >
       {icon}
-      <span>{label}</span>
+      <span className="hidden md:inline">{label}</span>
     </Link>
   );
 }

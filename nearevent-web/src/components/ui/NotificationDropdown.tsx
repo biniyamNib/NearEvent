@@ -109,7 +109,7 @@ export default function NotificationDropdown() {
       </button>
 
       {open ? (
-        <div className="absolute right-0 z-50 mt-2 w-[360px] max-w-[calc(100vw-2rem)] overflow-hidden rounded-2xl border border-border-default bg-bg-default shadow-lg">
+        <div className="absolute right-0 z-50 mt-2 w-[280px] overflow-hidden rounded-2xl border border-border-default bg-bg-default shadow-lg sm:w-[360px]">
           <div className="flex items-center justify-between border-b border-border-default px-4 py-3">
             <h3 className="text-sm font-semibold text-text-primary">
               Notifications

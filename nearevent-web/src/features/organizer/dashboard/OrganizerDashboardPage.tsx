@@ -93,16 +93,24 @@ export default function OrganizerDashboardPage() {
 
         <div className="overflow-hidden rounded-2xl border border-border-default bg-bg-default">
           <div className="overflow-x-auto">
-            <table className="min-w-full text-sm">
+            <table className="min-w-[560px] w-full text-sm md:min-w-full">
               <thead className="bg-bg-subtle text-text-secondary">
                 <tr>
-                  <th className="px-5 py-3 text-left font-medium">Event</th>
-                  <th className="px-5 py-3 text-left font-medium">Date</th>
-                  <th className="px-5 py-3 text-left font-medium">Status</th>
-                  <th className="px-5 py-3 text-left font-medium">
+                  <th className="px-3 py-2 text-left font-medium md:px-5 md:py-3">
+                    Event
+                  </th>
+                  <th className="px-3 py-2 text-left font-medium md:px-5 md:py-3">
+                    Date
+                  </th>
+                  <th className="px-3 py-2 text-left font-medium md:px-5 md:py-3">
+                    Status
+                  </th>
+                  <th className="hidden px-3 py-2 text-left font-medium md:table-cell md:px-5 md:py-3">
                     Registrations
                   </th>
-                  <th className="px-5 py-3 text-left font-medium">Actions</th>
+                  <th className="px-3 py-2 text-left font-medium md:px-5 md:py-3">
+                    Actions
+                  </th>
                 </tr>
               </thead>
 
@@ -111,40 +119,37 @@ export default function OrganizerDashboardPage() {
                   <tr>
                     <td
                       colSpan={5}
-                      className="px-5 py-8 text-center text-text-secondary"
+                      className="px-3 py-8 text-center text-text-secondary md:px-5"
                     >
                       No events yet. Create your first event.
                     </td>
                   </tr>
                 ) : (
                   events.map((event) => (
-                    <tr
-                      key={event.id}
-                      className="border-t border-border-default"
-                    >
-                      <td className="px-5 py-4">
+                    <tr key={event.id} className="border-t border-border-default">
+                      <td className="px-3 py-3 md:px-5 md:py-4">
                         <div className="font-medium text-text-primary">
                           {event.title}
                         </div>
-                        <div className="text-xs text-text-tertiary">
+                        <div className="text-xs text-text-tertiary line-clamp-1">
                           {event.address}
                         </div>
                       </td>
 
-                      <td className="px-5 py-4 text-text-secondary whitespace-nowrap">
+                      <td className="px-3 py-3 text-text-secondary whitespace-nowrap md:px-5 md:py-4">
                         {formatEventDateTime(event.event_date, event.start_time)}
                       </td>
 
-                      <td className="px-5 py-4">
+                      <td className="px-3 py-3 md:px-5 md:py-4">
                         <StatusBadge status={event.status} />
                       </td>
 
-                      <td className="px-5 py-4 text-text-secondary whitespace-nowrap">
+                      <td className="hidden px-3 py-3 text-text-secondary whitespace-nowrap md:table-cell md:px-5 md:py-4">
                         {`${event.registrations_count ?? 0} registered`}
                       </td>
 
-                      <td className="px-5 py-4">
-                        <div className="flex items-center gap-4">
+                      <td className="px-3 py-3 md:px-5 md:py-4">
+                        <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-4">
                           <Link
                             to={`/organizer/events/${event.id}`}
                             className="text-brand-primary hover:underline"
