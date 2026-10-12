@@ -1,19 +1,29 @@
-export function formatEventDateTime(date: string, time: string) {
-  const cleanTime = time.slice(0, 5);
-  const value = new Date(`${date}T${cleanTime}:00`);
+export function formatEventDateTime(
+  dateStr?: string,
+  timeStr?: string
+): string {
+  if (!dateStr) return "—";
 
-  if (Number.isNaN(value.getTime())) {
-    return `${date} · ${cleanTime}`;
+  try {
+    const time = (timeStr || "00:00").slice(0, 5);
+    const d = new Date(`${dateStr}T${time}:00`);
+
+    if (Number.isNaN(d.getTime())) return dateStr;
+
+    const weekday = d.toLocaleDateString("en-US", { weekday: "short" });
+    const day = d.getDate(); 
+    const month = d.toLocaleDateString("en-US", { month: "short" }); 
+
+    const timeLabel = d.toLocaleTimeString("en-US", {
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+    }); 
+
+    return `${weekday} ${day} ${month}, ${timeLabel}`;
+  } catch {
+    return dateStr;
   }
-
-  return value.toLocaleString("en-US", {
-    weekday: "short",
-    day: "2-digit",
-    month: "short",
-    hour: "numeric",
-    minute: "2-digit",
-    hour12: true,
-  });
 }
 
 export function formatDateLabel(dateStr: string) {
