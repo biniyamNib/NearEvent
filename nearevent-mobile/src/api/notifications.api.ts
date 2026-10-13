@@ -1,4 +1,3 @@
-// src/api/notifications.api.ts
 import { api } from "./client";
 import { Platform } from "react-native";
 

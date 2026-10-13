@@ -17,6 +17,7 @@ import {
   markNotificationRead,
   type NotificationItem,
 } from "../../api/notifications.api";
+import { useNotificationSocket } from "../../hooks/useNotificationSocket";
 
 function relativeTime(value?: string) {
   if (!value) return "";
@@ -40,6 +41,7 @@ function iconForType(type: string): keyof typeof Ionicons.glyphMap {
   if (t.includes("remind")) return "time";
   if (t.includes("update") || t.includes("change")) return "refresh-circle";
   if (t.includes("approv")) return "checkmark-circle";
+  if (t.includes("review")) return "star";
   return "notifications";
 }
 
@@ -69,6 +71,27 @@ export default function NotificationsScreen() {
     }, [])
   );
 
+  // Real-time while this screen is open
+  useNotificationSocket(
+    useCallback((n: any) => {
+      setItems((prev) => {
+        if (!n?.id || prev.some((x) => x.id === n.id)) return prev;
+        return [
+          {
+            id: n.id,
+            type: n.type ?? "",
+            title: n.title ?? "",
+            message: n.message ?? "",
+            is_read: n.is_read ?? false,
+            created_at: n.created_at ?? new Date().toISOString(),
+            event_id: n.event_id ?? null,
+          },
+          ...prev,
+        ];
+      });
+    }, [])
+  );
+
   const onMarkAll = async () => {
     try {
       await markAllNotificationsRead();
@@ -89,12 +112,17 @@ export default function NotificationsScreen() {
         // ignore
       }
     }
-    // optional: navigate to event if event_id exists
+
+    if (item.event_id) {
+      navigation.navigate("Home", {
+        screen: "EventDetails",
+        params: { eventId: item.event_id },
+      });
+    }
   };
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background.default }}>
-      {/* Header */}
       <View
         style={{
           paddingTop: 54,
@@ -119,14 +147,22 @@ export default function NotificationsScreen() {
           Notifications
         </Text>
         <TouchableOpacity onPress={onMarkAll}>
-          <Text style={{ color: colors.brand.primary, fontSize: 13, fontWeight: "600" }}>
+          <Text
+            style={{
+              color: colors.brand.primary,
+              fontSize: 13,
+              fontWeight: "600",
+            }}
+          >
             Mark all as read
           </Text>
         </TouchableOpacity>
       </View>
 
       {loading ? (
-        <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+        <View
+          style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+        >
           <ActivityIndicator color={colors.brand.primary} />
         </View>
       ) : (
@@ -153,7 +189,11 @@ export default function NotificationsScreen() {
                 paddingTop: 80,
               }}
             >
-              <Ionicons name="file-tray-outline" size={72} color={colors.brand.primary} />
+              <Ionicons
+                name="file-tray-outline"
+                size={72}
+                color={colors.brand.primary}
+              />
               <Text
                 style={{
                   marginTop: 16,
@@ -182,8 +222,9 @@ export default function NotificationsScreen() {
                   borderBottomColor: colors.border.default,
                 }}
               >
-                {/* unread dot */}
-                <View style={{ width: 12, alignItems: "center", paddingTop: 6 }}>
+                <View
+                  style={{ width: 12, alignItems: "center", paddingTop: 6 }}
+                >
                   {unread ? (
                     <View
                       style={{
