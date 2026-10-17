@@ -10,7 +10,6 @@ import { useAuthStore } from "../../../store/authStore";
 
 export default function SignupPage() {
   const navigate = useNavigate();
-  const setAuth = useAuthStore((s) => s.setAuth);
 
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
@@ -75,7 +74,7 @@ export default function SignupPage() {
     const start = Date.now();
 
     try {
-      const data = await register({
+      await register({
         full_name: fullName.trim(),
         email: email.trim(),
         password,
@@ -91,7 +90,6 @@ export default function SignupPage() {
 
       console.log("register success, going to login");
 
-    //   setAuth(data.token, data.user);
       navigate("/login", {
         state: { message: "Account created successfully. Please log in." },
       });

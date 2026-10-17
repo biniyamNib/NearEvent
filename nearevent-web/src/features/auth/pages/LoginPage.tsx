@@ -7,15 +7,15 @@ import Input from "../../../components/ui/Input";
 import Logo from "../../../components/ui/Logo";
 import { useAuthStore } from "../../../store/authStore";
 import ForgotPasswordModal from "../components/ForgotPasswordModal";
-import { useLocation } from "react-router-dom";
+// import { useLocation } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 
 export default function LoginPage() {
   const navigate = useNavigate();
   const setAuth = useAuthStore((s) => s.setAuth);
 
-  const location = useLocation();
-  const successMessage = (location.state as { message?: string })?.message;
+  // const location = useLocation();
+  // const successMessage = (location.state as { message?: string })?.message;
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -109,13 +109,11 @@ export default function LoginPage() {
             Sign in to your account
           </p>
         </div>
-
         <form onSubmit={onSubmit} className="mt-8 space-y-4">
           <label className="mb-1.5 block text-sm text-text-secondary">
             Email <span className="text-status-error">*</span>
           </label>
           <Input
-          //   label="Email *"
             type="email"
             value={email}
             onChange={(e) => {

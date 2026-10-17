@@ -48,7 +48,6 @@ export default function AdminDashboardPage() {
   const [pending, setPending] = useState<PendingEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
 
   const load = async () => {
     try {
@@ -70,28 +69,22 @@ export default function AdminDashboardPage() {
     load();
   }, []);
 
-  const onApprove = async (id: string) => {
-    setActionLoadingId(id);
+  async (id: string) => {
     try {
       await approveEvent(id);
       await load();
     } catch (err: any) {
       setError(err?.response?.data?.message || "Approve failed");
-    } finally {
-      setActionLoadingId(null);
     }
   };
 
-  const onReject = async (id: string) => {
-    setActionLoadingId(id);
+  async (id: string) => {
     try {
       await rejectEvent(id, "Rejected by admin");
       await load();
     } catch (err: any) {
       setError(err?.response?.data?.message || "Reject failed");
-    } finally {
-      setActionLoadingId(null);
-    }
+    } 
   };
 
   if (loading) {
