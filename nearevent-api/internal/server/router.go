@@ -37,8 +37,7 @@ func NewRouter(deps Dependencies) http.Handler {
 	r.Use(chimw.Recoverer)
 	r.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   []string{
-			"http://localhost:5173",
-			"https://near-event-five.vercel.app",
+			"https://near-event-five.vercel.app/",
 		},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type"},
