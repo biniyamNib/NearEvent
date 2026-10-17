@@ -18,6 +18,7 @@ type Config struct {
 	DBPass            string
 	DBName            string
 	DBSSL             string
+	DatabaseURLRaw    string 
 	JWTSecret         string
 	JWTExpiresInHours int
 	AdminEmail        string
@@ -36,23 +37,30 @@ func Load() (*Config, error) {
 		return nil, fmt.Errorf("invalid JWT_EXPIRES_IN_HOURS: %w", err)
 	}
 
+	// Render sets PORT; local can use APP_PORT
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = getEnv("APP_PORT", "8080")
+	}
+
 	cfg := &Config{
 		AppName:           getEnv("APP_NAME", "NearEvent API"),
 		AppEnv:            getEnv("APP_ENV", "development"),
-		AppPort:           getEnv("APP_PORT", "8080"),
+		AppPort:           port,
 		DBHost:            getEnv("DB_HOST", "localhost"),
 		DBPort:            getEnv("DB_PORT", "5432"),
 		DBUser:            getEnv("DB_USER", "postgres"),
 		DBPass:            getEnv("DB_PASSWORD", "postgres"),
 		DBName:            getEnv("DB_NAME", "NearEvent"),
 		DBSSL:             getEnv("DB_SSLMODE", "disable"),
+		DatabaseURLRaw:    os.Getenv("DATABASE_URL"),
 		JWTSecret:         getEnv("JWT_SECRET", "dev-secret-change-me"),
 		JWTExpiresInHours: expiresHours,
 		AdminEmail:        getEnv("ADMIN_EMAIL", "admin@nearevent.com"),
 		AdminPassword:     getEnv("ADMIN_PASSWORD", "Admin123!"),
 		AdminName:         getEnv("ADMIN_NAME", "Admin User"),
 		ResendApiKey:      getEnv("RESEND_API_KEY", ""),
-        EmailFrom:         getEnv("EMAIL_FROM", ""),
+		EmailFrom:         getEnv("EMAIL_FROM", ""),
 		AppResetUrl:       getEnv("APP_RESET_URL", "http://localhost:5173/reset-password"),
 	}
 
@@ -60,6 +68,11 @@ func Load() (*Config, error) {
 }
 
 func (c *Config) DatabaseURL() string {
+	// Prefer full URL (Render Internal/External Database URL)
+	if c.DatabaseURLRaw != "" {
+		return c.DatabaseURLRaw
+	}
+
 	return fmt.Sprintf(
 		"postgres://%s:%s@%s:%s/%s?sslmode=%s",
 		c.DBUser,
