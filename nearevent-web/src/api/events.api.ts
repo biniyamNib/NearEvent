@@ -19,6 +19,7 @@ export type OrganizerDashboardStats = {
 export type EventItem = {
   id: string;
   title: string;
+  description?: string;
   venue_name: string;
   address: string;
   event_date: string;
@@ -26,6 +27,7 @@ export type EventItem = {
   end_time: string;
   status: string;
   capacity: number;
+  image_url?: string;
   registrations_count?: number;
 };
 

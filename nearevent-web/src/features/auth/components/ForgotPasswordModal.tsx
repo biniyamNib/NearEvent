@@ -1,4 +1,5 @@
-import { FormEvent, useState } from "react";
+import { useState } from "react";
+import type { FormEvent } from "react";
 import { forgotPassword } from "../../../api/auth.api";
 import Button from "../../../components/ui/Button";
 import Input from "../../../components/ui/Input";

@@ -1,4 +1,5 @@
-import { FormEvent, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import type { FormEvent } from "react";
 import { getMe } from "../../../api/auth.api";
 import { api } from "../../../api/client";
 import { uploadImage } from "../../../api/uploads.api";
