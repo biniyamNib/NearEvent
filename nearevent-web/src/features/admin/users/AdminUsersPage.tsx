@@ -52,7 +52,6 @@ export default function AdminUsersPage() {
 
   const filtered = useMemo(() => {
     return users.filter((u) => {
-      // Hide admin accounts from this management list
       if (u.role === "admin") return false;
 
       if (tab === "attendee" && u.role !== "attendee") return false;

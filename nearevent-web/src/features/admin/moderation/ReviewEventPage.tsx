@@ -73,7 +73,7 @@ export default function ReviewEventPage() {
     if (!event?.image_url) return null;
     return event.image_url.startsWith("http")
       ? event.image_url
-      : `http://localhost:8080${event.image_url}`;
+      : `https://nearevent-api.onrender.com${event.image_url}`;
   }, [event]);
 
   const runAction = async (type: "approve" | "reject" | "request") => {

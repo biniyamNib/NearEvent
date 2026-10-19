@@ -34,8 +34,6 @@ export default function ResetPasswordPage() {
 
     setLoading(true);
     try {
-      // Use the field name your API expects:
-      // new_password OR password — match your DTO
       await api.post("/auth/reset-password", {
         token,
         new_password: password,

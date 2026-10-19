@@ -113,7 +113,7 @@ export default function AdminSettingsPage() {
   const displayAvatar = avatarUrl
     ? avatarUrl.startsWith("http") || avatarUrl.startsWith("blob:")
       ? avatarUrl
-      : `http://localhost:8080${avatarUrl}`
+      : `https://nearevent-api.onrender.com${avatarUrl}`
     : null;
 
   if (loading) {

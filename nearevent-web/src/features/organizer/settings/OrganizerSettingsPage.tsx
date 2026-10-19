@@ -52,7 +52,7 @@ export default function OrganizerSettingsPage() {
     const file = e.target.files?.[0];
     if (!file) return;
     setAvatarFile(file);
-    setAvatarUrl(URL.createObjectURL(file)); // local preview
+    setAvatarUrl(URL.createObjectURL(file)); 
   };
 
   const validate = () => {
@@ -108,7 +108,7 @@ export default function OrganizerSettingsPage() {
   const displayAvatar = avatarUrl
     ? avatarUrl.startsWith("http") || avatarUrl.startsWith("blob:")
       ? avatarUrl
-      : `http://localhost:8080${avatarUrl}`
+      : `https://nearevent-api.onrender.com${avatarUrl}`
     : null;
 
   if (loading) {
