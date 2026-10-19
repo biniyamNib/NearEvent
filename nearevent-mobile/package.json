@@ -11,6 +11,7 @@
     "axios": "^1.20.0",
     "device-info": "^1.0.3",
     "expo": "~57.0.24",
+    "expo-dev-client": "~57.0.20",
     "expo-device": "~57.0.2",
     "expo-image-picker": "~57.0.20",
     "expo-notifications": "~57.0.21",
