@@ -122,7 +122,7 @@ export default function EventDetailsPage() {
     return <div className="text-status-error">{error || "Event not found"}</div>;
   }
 
-  const API_ORIGIN = "http://localhost:8080";
+  const API_ORIGIN = "https://nearevent-api.onrender.com";
 
   const fullImageUrl = event.image_url
     ? event.image_url.startsWith("http")
