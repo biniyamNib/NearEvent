@@ -13,7 +13,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { colors } from "../../theme/colors";
 import { api } from "../../api/client";
 
-const API_ORIGIN = "http://10.200.9.61:8080";
+const API_ORIGIN = "https://nearevent-api.onrender.com";
 type TabKey = "registered" | "saved";
 
 type EventCard = {

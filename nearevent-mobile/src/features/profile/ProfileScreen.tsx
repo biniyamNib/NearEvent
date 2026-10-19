@@ -5,7 +5,7 @@ import { useNavigation } from "@react-navigation/native";
 import { colors } from "../../theme/colors";
 import { useAuthStore } from "../../store/authStore";
 
-const API_ORIGIN = "http://10.200.9.61:8080";
+const API_ORIGIN = "https://nearevent-api.onrender.com";
 
 export default function ProfileScreen() {
   const navigation = useNavigation<any>();

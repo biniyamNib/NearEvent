@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useAuthStore } from "../store/authStore";
 
-const WS_BASE = "ws://10.200.9.61:8080/api/v1/notifications/ws";
+const WS_BASE = "ws://https://nearevent-api.onrender.com/api/v1/notifications/ws";
 
 export function useNotificationSocket(onMessage: (data: any) => void) {
   const token = useAuthStore((s) => s.token);

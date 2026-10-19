@@ -16,7 +16,7 @@ import { colors } from "../../theme/colors";
 import { getActiveCategories } from "../../api/categories.api";
 import { api } from "../../api/client";
 
-const API_ORIGIN = "http://10.200.9.61:8080"; 
+const API_ORIGIN = "https://nearevent-api.onrender.com"; 
 const RECENT_KEY = "nearevent_recent_searches";
 
 type Category = { id: string; name: string };

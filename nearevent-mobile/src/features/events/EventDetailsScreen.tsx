@@ -32,7 +32,7 @@ import {
 
 type Props = NativeStackScreenProps<HomeStackParamList, "EventDetails">;
 
-const API_ORIGIN = "http://10.200.9.61:8080";
+const API_ORIGIN = "https://nearevent-api.onrender.com";
 
 function formatDateTime(dateStr?: string, start?: string, end?: string) {
   if (!dateStr) return "—";

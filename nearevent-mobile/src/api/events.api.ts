@@ -30,7 +30,7 @@ export const getMyRegisteredEvents = async () => {
 };
 
 export const getMySavedEvents = async () => {
-  const res = await api.get("/users/me/saved-events"); // adjust if your path differs
+  const res = await api.get("/users/me/saved-events"); 
   return res.data.data;
 };
 

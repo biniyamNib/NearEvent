@@ -1,4 +1,3 @@
-// src/features/auth/SplashScreen.tsx
 import { useEffect } from "react";
 import { View, Text } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";

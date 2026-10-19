@@ -97,7 +97,6 @@ export default function NotificationsScreen() {
       await markAllNotificationsRead();
       setItems((prev) => prev.map((n) => ({ ...n, is_read: true })));
     } catch {
-      // ignore for MVP
     }
   };
 

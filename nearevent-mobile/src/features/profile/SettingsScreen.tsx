@@ -22,7 +22,7 @@ import { api } from "../../api/client";
 // Adjust param list name to your navigator
 type Props = NativeStackScreenProps<any, "Settings">;
 
-const API_ORIGIN = "http://10.200.9.61:8080";
+const API_ORIGIN = "https://nearevent-api.onrender.com";
 
 export default function SettingsScreen({ navigation }: Props) {
   const user = useAuthStore((s) => s.user);
