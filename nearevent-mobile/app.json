@@ -17,7 +17,9 @@
       "ios": {
         "bundleIdentifier": "com.nearevent.app",
         "infoPlist": {
-          "UIBackgroundModes": ["remote-notification"]
+          "UIBackgroundModes": [
+            "remote-notification"
+          ]
         }
       },
       "extra": {
@@ -41,12 +43,17 @@
     "plugins": [
       "expo-secure-store",
       [
-      "expo-notifications",
-      {
-        "icon": "./assets/notification-icon.png",
-        "color": "#2563EB"
-      }
+        "expo-notifications",
+        {
+          "icon": "./assets/notification-icon.png",
+          "color": "#2563EB"
+        }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "cce2ba0f-e6de-40c7-b373-3bf7d10173b3"
+      }
+    }
   }
 }
