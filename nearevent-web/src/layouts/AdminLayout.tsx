@@ -19,7 +19,9 @@ export default function AdminLayout() {
   const logout = useAuthStore((s) => s.logout);
   const [logoutOpen, setLogoutOpen] = useState(false);
 
-  const API_ORIGIN = "http://localhost:8080";
+  const API_ORIGIN =
+    import.meta.env.VITE_API_URL?.replace(/\/api\/v1\/?$/, "") ||
+    "http://localhost:8080";
 
   const avatarSrc = user?.avatar_url
     ? user.avatar_url.startsWith("http") || user.avatar_url.startsWith("blob:")
@@ -53,7 +55,7 @@ export default function AdminLayout() {
       </header>
 
       <div className="flex flex-1 min-h-0">
-        <aside className="w-64 shrink-0 border-r border-border-default bg-bg-default px-4 py-5 flex flex-col">
+        <aside className="flex w-[72px] shrink-0 flex-col border-r border-border-default bg-bg-default px-2 py-5 md:w-64 md:px-4">
           <nav className="space-y-1">
             <SideNavItem
               to="/admin/dashboard"
@@ -84,10 +86,11 @@ export default function AdminLayout() {
           <button
             type="button"
             onClick={() => setLogoutOpen(true)}
-            className="mt-auto flex items-center gap-2 px-3 py-2.5 text-sm text-status-error hover:opacity-80"
+            className="mt-auto flex items-center justify-center gap-2 px-2 py-2.5 text-sm text-status-error hover:opacity-80 md:justify-start md:px-3"
+            title="Log Out"
           >
             <LogOut size={18} />
-            Log Out
+            <span className="hidden md:inline">Log Out</span>
           </button>
         </aside>
 
